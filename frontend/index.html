@@ -356,6 +356,7 @@ tr:hover td{background:#fafaf9;}
         </table>
       </div>
     </div>
+    <div id="search-page" style="display:none">
       <div class="search-page">
         <h2>Buscar produto</h2>
         <p>Pesquise por Cód. Product, SKU principal ou qualquer SKU equivalente de fornecedor.</p>
@@ -510,7 +511,7 @@ async function initProdutos(){
     await new Promise(r=>setTimeout(r,150));
     document.getElementById("loading").style.display="none";
     document.getElementById("search-page").style.display="block";
-    buildCatGrid();
+    setTimeout(buildCatGrid, 50);
     document.getElementById("topbar-stats").textContent=
       Object.keys(PI).length.toLocaleString()+" produtos · "+
       Object.keys(S2C).length.toLocaleString()+" SKUs mapeados";
