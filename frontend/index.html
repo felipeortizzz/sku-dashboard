@@ -309,13 +309,13 @@ tr:hover td{background:#fafaf9;}
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <div class="sidebar-section">Menu</div>
-  <button class="nav-item active" id="nav-produtos" onclick="switchModule('produtos')">
-    <span class="nav-icon">📦</span>
-    <span class="nav-label">Produtos</span>
-  </button>
   <button class="nav-item" id="nav-dashboard" onclick="switchModule('dashboard')">
     <span class="nav-icon">📊</span>
     <span class="nav-label">Dashboard</span>
+  </button>
+  <button class="nav-item active" id="nav-produtos" onclick="switchModule('produtos')">
+    <span class="nav-icon">📦</span>
+    <span class="nav-label">Produtos</span>
   </button>
   <button class="nav-item" id="nav-cruzamento" onclick="switchModule('cruzamento')">
     <span class="nav-icon">🔗</span>
@@ -437,26 +437,53 @@ tr:hover td{background:#fafaf9;}
   <!-- ── MÓDULO: DASHBOARD ── -->
   <div class="module" id="module-dashboard">
     <div class="dash-page">
+
       <div class="dash-header">
-        <h2>Dashboard</h2>
-        <p>Visão geral do negócio</p>
-        <button class="btn-sm" onclick="exportPrecificacao()" style="margin-left:auto">⬇ Exportar Precificação</button>
+        <div>
+          <h2>Dashboard</h2>
+          <p>Visão geral do negócio</p>
+        </div>
+        <button class="dash-export-btn" onclick="exportPrecificacao()">
+          <span>⬇</span> Exportar Precificação
+        </button>
       </div>
+
       <div id="dash-stats" class="dash-stats-grid"></div>
+
       <div class="dash-row">
-        <div class="dash-card" id="dash-margin-alerts">
-          <div class="dash-card-head">⚠️ Alertas de margem</div>
-          <div class="dash-card-body" id="dash-margin-body">Carregando...</div>
+        <div class="dash-card">
+          <div class="dash-card-head">
+            <span class="dash-card-icon dash-icon-red">⚠</span>
+            Alertas de margem
+            <span class="dash-card-sub">Preço atual abaixo do calculado</span>
+          </div>
+          <div class="dash-card-body" id="dash-margin-body">
+            <div class="dash-loading">Carregando...</div>
+          </div>
         </div>
-        <div class="dash-card" id="dash-cats-card">
-          <div class="dash-card-head">📦 Produtos por categoria</div>
-          <div class="dash-card-body" id="dash-cats-body">Carregando...</div>
+        <div class="dash-card">
+          <div class="dash-card-head">
+            <span class="dash-card-icon dash-icon-dark">📦</span>
+            Produtos por categoria
+            <span class="dash-card-sub">Clique para explorar</span>
+          </div>
+          <div class="dash-card-body" id="dash-cats-body">
+            <div class="dash-loading">Carregando...</div>
+          </div>
         </div>
       </div>
+
       <div class="dash-card" style="margin-top:16px">
-        <div class="dash-card-head">💲 Preços divergentes nos Marketplaces</div>
-        <div class="dash-card-body" id="dash-div-body">Carregando...</div>
+        <div class="dash-card-head">
+          <span class="dash-card-icon dash-icon-orange">↕</span>
+          Preços divergentes nos Marketplaces
+          <span class="dash-card-sub">Variação maior que 5% entre canais</span>
+        </div>
+        <div class="dash-card-body" id="dash-div-body">
+          <div class="dash-loading">Carregando...</div>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -1412,59 +1439,59 @@ function buildDashboard() {
 
   // Stats
   document.getElementById('dash-stats').innerHTML = `
-    <div class="dash-stat">
-      <div class="dash-stat-num">${totalActive.toLocaleString()}</div>
+    <div class="dash-stat s-blue">
+      <div class="dash-stat-num" style="color:#3b82f6">${totalActive.toLocaleString()}</div>
       <div class="dash-stat-lbl">Produtos ativos</div>
-      <div class="dash-stat-sub" style="color:#22c55e">${withStock.toLocaleString()} com estoque</div>
+      <div class="dash-stat-sub" style="color:#22c55e">✓ ${withStock.toLocaleString()} com estoque disponível</div>
     </div>
-    <div class="dash-stat">
+    <div class="dash-stat s-red">
       <div class="dash-stat-num" style="color:#ef4444">${marginAlerts.length.toLocaleString()}</div>
       <div class="dash-stat-lbl">Alertas de margem</div>
-      <div class="dash-stat-sub" style="color:#ef4444">Preço abaixo do calculado</div>
+      <div class="dash-stat-sub" style="color:#ef4444">⚠ Preço abaixo do calculado</div>
     </div>
-    <div class="dash-stat">
+    <div class="dash-stat s-orange">
       <div class="dash-stat-num" style="color:#f59e0b">${divAlerts.length.toLocaleString()}</div>
       <div class="dash-stat-lbl">Preços divergentes</div>
-      <div class="dash-stat-sub" style="color:#f59e0b">Variação > 5% entre MPs</div>
+      <div class="dash-stat-sub" style="color:#f59e0b">↕ Variação > 5% entre MPs</div>
     </div>
-    <div class="dash-stat">
+    <div class="dash-stat s-gray">
       <div class="dash-stat-num" style="color:#78716c">${totalPaused.toLocaleString()}</div>
       <div class="dash-stat-lbl">Inativados</div>
-      <div class="dash-stat-sub" style="color:#78716c">${noPrice.toLocaleString()} sem preço</div>
+      <div class="dash-stat-sub" style="color:#a8a29e">${noPrice.toLocaleString()} sem preço na tabela</div>
     </div>
   `;
 
   // Margin alerts
   marginAlerts.sort((a,b) => a.diff - b.diff);
   document.getElementById('dash-margin-body').innerHTML = marginAlerts.length === 0
-    ? '<div style="font-size:13px;color:#22c55e;padding:8px 0">✓ Nenhum produto com preço abaixo do calculado</div>'
-    : marginAlerts.slice(0,50).map(a =>
-        `<div class="dash-alert-row" onclick="showProduct('${a.cod}')">
+    ? '<div class="dash-empty">✓ Nenhum produto com preço abaixo do calculado</div>'
+    : marginAlerts.slice(0,80).map(a =>
+        `<div class="dash-alert-row" onclick="showProduct('${a.cod}');switchModule('produtos')">
           <span class="dash-alert-sku">${a.sku}</span>
-          <span class="dash-alert-name">${(a.name||'').slice(0,40)}</span>
-          <span style="font-size:10px;color:#a8a29e;margin-right:6px">${a.mp}</span>
-          <span class="dash-alert-val red">$${a.current.toFixed(2)} <span style="font-size:10px">(calc: $${a.calc.toFixed(2)})</span></span>
+          <span class="dash-alert-name" title="${a.name||''}">${(a.name||'').slice(0,35)}</span>
+          <span class="dash-alert-mp">${a.mp}</span>
+          <span class="dash-alert-val red">$${a.current.toFixed(2)}<br><span class="dash-alert-calc">calc: $${a.calc.toFixed(2)}</span></span>
         </div>`
-      ).join('') + (marginAlerts.length > 50 ? `<div style="font-size:11px;color:#a8a29e;padding:8px 0">...e mais ${marginAlerts.length-50} produtos</div>` : '');
+      ).join('') + (marginAlerts.length > 80 ? `<div style="font-size:11px;color:#a8a29e;padding:10px 18px">...e mais ${marginAlerts.length-80} produtos</div>` : '');
 
   // Divergence alerts
   divAlerts.sort((a,b) => b.pct - a.pct);
   document.getElementById('dash-div-body').innerHTML = divAlerts.length === 0
-    ? '<div style="font-size:13px;color:#22c55e;padding:8px 0">✓ Nenhuma divergência significativa de preços</div>'
-    : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px">` +
+    ? '<div class="dash-empty">✓ Nenhuma divergência significativa de preços</div>'
+    : `<div class="dash-div-grid">` +
       divAlerts.slice(0,60).map(a =>
-        `<div style="border:1px solid #e7e5e4;border-radius:8px;padding:10px 14px;cursor:pointer" onclick="showProduct('${a.cod}')">
-          <div style="font-family:monospace;font-size:12px;font-weight:700;color:#1d4ed8">${a.sku}</div>
-          <div style="font-size:11px;color:#57534e;margin:3px 0">${(a.name||'').slice(0,45)}</div>
-          <div style="font-size:12px;font-weight:700;color:#f59e0b">$${a.mn.toFixed(2)} – $${a.mx.toFixed(2)} <span style="font-size:10px">(${a.pct.toFixed(1)}%)</span></div>
+        `<div class="dash-div-item" onclick="showProduct('${a.cod}');switchModule('produtos')">
+          <div class="dash-div-sku">${a.sku}</div>
+          <div class="dash-div-name" title="${a.name||''}">${(a.name||'').slice(0,48)}</div>
+          <div class="dash-div-range">$${a.mn.toFixed(2)} – $${a.mx.toFixed(2)}<span class="dash-div-pct">${a.pct.toFixed(1)}% variação</span></div>
         </div>`
-      ).join('') + '</div>';
+      ).join('') + '</div>' + (divAlerts.length > 60 ? `<div style="font-size:11px;color:#a8a29e;padding:10px 18px">...e mais ${divAlerts.length-60} produtos</div>` : '');
 
   // Categories
   const sortedCats = Object.entries(catCounts).sort((a,b) => b[1]-a[1]);
   const maxCat = sortedCats[0]?.[1] || 1;
   document.getElementById('dash-cats-body').innerHTML = sortedCats.map(([cat, count]) =>
-    `<div class="dash-cat-row" style="cursor:pointer" onclick="switchModule('produtos');setTimeout(()=>openCategory('${cat.replace(/'/g,"\'")}'),100)">
+    `<div class="dash-cat-row" onclick="switchModule('produtos');setTimeout(()=>openCategory('${cat.replace(/'/g,"\'")}'),100)">
       <span class="dash-cat-name">${cat}</span>
       <div class="dash-cat-bar-wrap"><div class="dash-cat-bar" style="width:${count/maxCat*100}%"></div></div>
       <span class="dash-cat-count">${count.toLocaleString()}</span>
