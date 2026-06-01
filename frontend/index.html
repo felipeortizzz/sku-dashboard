@@ -305,6 +305,7 @@ tr:hover td{background:#fafaf9;}
   <div class="topbar-stats" id="topbar-stats"></div>
 </div>
 
+<div class="mob-overlay" id="mob-overlay" onclick="closeSidebar()"></div>
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <div class="sidebar-section">Menu</div>
@@ -312,11 +313,15 @@ tr:hover td{background:#fafaf9;}
     <span class="nav-icon">📦</span>
     <span class="nav-label">Produtos</span>
   </button>
+  <button class="nav-item" id="nav-dashboard" onclick="switchModule('dashboard')">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">Dashboard</span>
+  </button>
   <button class="nav-item" id="nav-cruzamento" onclick="switchModule('cruzamento')">
     <span class="nav-icon">🔗</span>
     <span class="nav-label">Cruzamento de Peças</span>
   </button>
-  <div class="sidebar-footer">v1.0 · CM Compressor</div>
+  <div class="sidebar-footer">v1.1 · Qualy Air</div>
 </div>
 
 <!-- MAIN -->
@@ -429,6 +434,32 @@ tr:hover td{background:#fafaf9;}
 
   </div><!-- /module-produtos -->
 
+  <!-- ── MÓDULO: DASHBOARD ── -->
+  <div class="module" id="module-dashboard">
+    <div class="dash-page">
+      <div class="dash-header">
+        <h2>Dashboard</h2>
+        <p>Visão geral do negócio</p>
+        <button class="btn-sm" onclick="exportPrecificacao()" style="margin-left:auto">⬇ Exportar Precificação</button>
+      </div>
+      <div id="dash-stats" class="dash-stats-grid"></div>
+      <div class="dash-row">
+        <div class="dash-card" id="dash-margin-alerts">
+          <div class="dash-card-head">⚠️ Alertas de margem</div>
+          <div class="dash-card-body" id="dash-margin-body">Carregando...</div>
+        </div>
+        <div class="dash-card" id="dash-cats-card">
+          <div class="dash-card-head">📦 Produtos por categoria</div>
+          <div class="dash-card-body" id="dash-cats-body">Carregando...</div>
+        </div>
+      </div>
+      <div class="dash-card" style="margin-top:16px">
+        <div class="dash-card-head">💲 Preços divergentes nos Marketplaces</div>
+        <div class="dash-card-body" id="dash-div-body">Carregando...</div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── MÓDULO: CRUZAMENTO ── -->
   <div class="module module-cruz" id="module-cruzamento">
     <div class="app">
@@ -480,8 +511,12 @@ function switchModule(name) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('module-' + name).classList.add('active');
   document.getElementById('nav-' + name).classList.add('active');
+  if(isMobile()) closeSidebar();
   if (name === 'produtos' && !produtosLoaded) {
     initProdutos();
+  } else if (name === 'dashboard') {
+    if(produtosLoaded) setTimeout(buildDashboard,50);
+    else initProdutos();
   }
 }
 
@@ -519,6 +554,7 @@ async function initProdutos(){
     document.getElementById("q").addEventListener("keydown",e=>{if(e.key==="Enter")doSearch();});
     document.getElementById("mini-q").addEventListener("keydown",e=>{if(e.key==="Enter")doMini();});
     produtosLoaded=true;
+    if(document.getElementById("module-dashboard").classList.contains("active"))setTimeout(buildDashboard,50);
   }catch(err){
     document.getElementById("load-txt").textContent="Erro: "+err.message;
     console.error(err);
@@ -1140,13 +1176,22 @@ function exportResults(){
 }
 
 
+function isMobile(){return window.innerWidth<=768;}
 function toggleSidebar(){
   const sidebar=document.getElementById('sidebar');
   const main=document.getElementById('main');
-  const icon=document.getElementById('toggle-icon');
-  sidebar.classList.toggle('collapsed');
-  main.classList.toggle('expanded');
-  icon.innerHTML=sidebar.classList.contains('collapsed')?'&#9776;':'&#9776;';
+  const overlay=document.getElementById('mob-overlay');
+  if(isMobile()){
+    sidebar.classList.toggle('mobile-open');
+    overlay.classList.toggle('visible',sidebar.classList.contains('mobile-open'));
+  } else {
+    sidebar.classList.toggle('collapsed');
+    main.classList.toggle('expanded');
+  }
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('mob-overlay').classList.remove('visible');
 }
 
 // ── CATEGORY FILTER ──
@@ -1313,6 +1358,158 @@ function toggleMargin() {
   const hidden = body.style.display === 'none';
   body.style.display = hidden ? 'block' : 'none';
   arrow.style.transform = hidden ? '' : 'rotate(180deg)';
+}
+
+
+// ── DASHBOARD ──
+function buildDashboard() {
+  if (!PI || !PX || !MP) return;
+
+  const allCods = Object.keys(PI);
+  let totalActive=0, totalPaused=0, withStock=0, noPrice=0;
+  let marginAlerts=[], divAlerts=[];
+  const catCounts = {};
+
+  allCods.forEach(cod => {
+    const prod = PI[cod];
+    const px = PX[cod];
+    if (!prod) return;
+
+    if (prod.paused) { totalPaused++; return; }
+    totalActive++;
+
+    const cat = prod.cat || 'Outros';
+    catCounts[cat] = (catCounts[cat]||0) + 1;
+
+    if (px?.has_stock) withStock++;
+    if (!px || px.status === 'Sem Preço na Tabela') { noPrice++; return; }
+
+    // Check margin alerts: current price below calculated
+    const psku = prod.sku;
+    MPC.forEach(m => {
+      const mpKey = MKP_MAP_TAXA[m.k];
+      const calcPrice = px.prices?.[mpKey];
+      if (!calcPrice) return;
+      const mpItem = (MP[psku.toUpperCase()]||[]).find(x=>x.mp===m.k);
+      if (!mpItem?.p) return;
+      const diff = mpItem.p - calcPrice;
+      if (diff < -0.5) {
+        marginAlerts.push({cod, sku:psku, name:prod.name, mp:m.l, current:mpItem.p, calc:calcPrice, diff});
+      }
+    });
+
+    // Check price divergence across MPs
+    const allSkus = [psku, ...prod.eq.map(([s])=>s)];
+    const allPrices = [];
+    allSkus.forEach(s => (MP[s.toUpperCase()]||[]).forEach(m => { if(m.p!=null) allPrices.push(m.p); }));
+    if (allPrices.length > 1) {
+      const mn = Math.min(...allPrices), mx = Math.max(...allPrices);
+      if (mn > 0 && (mx-mn)/mn*100 > 5) {
+        divAlerts.push({cod, sku:psku, name:prod.name, mn, mx, pct:(mx-mn)/mn*100});
+      }
+    }
+  });
+
+  // Stats
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="dash-stat">
+      <div class="dash-stat-num">${totalActive.toLocaleString()}</div>
+      <div class="dash-stat-lbl">Produtos ativos</div>
+      <div class="dash-stat-sub" style="color:#22c55e">${withStock.toLocaleString()} com estoque</div>
+    </div>
+    <div class="dash-stat">
+      <div class="dash-stat-num" style="color:#ef4444">${marginAlerts.length.toLocaleString()}</div>
+      <div class="dash-stat-lbl">Alertas de margem</div>
+      <div class="dash-stat-sub" style="color:#ef4444">Preço abaixo do calculado</div>
+    </div>
+    <div class="dash-stat">
+      <div class="dash-stat-num" style="color:#f59e0b">${divAlerts.length.toLocaleString()}</div>
+      <div class="dash-stat-lbl">Preços divergentes</div>
+      <div class="dash-stat-sub" style="color:#f59e0b">Variação > 5% entre MPs</div>
+    </div>
+    <div class="dash-stat">
+      <div class="dash-stat-num" style="color:#78716c">${totalPaused.toLocaleString()}</div>
+      <div class="dash-stat-lbl">Inativados</div>
+      <div class="dash-stat-sub" style="color:#78716c">${noPrice.toLocaleString()} sem preço</div>
+    </div>
+  `;
+
+  // Margin alerts
+  marginAlerts.sort((a,b) => a.diff - b.diff);
+  document.getElementById('dash-margin-body').innerHTML = marginAlerts.length === 0
+    ? '<div style="font-size:13px;color:#22c55e;padding:8px 0">✓ Nenhum produto com preço abaixo do calculado</div>'
+    : marginAlerts.slice(0,50).map(a =>
+        `<div class="dash-alert-row" onclick="showProduct('${a.cod}')">
+          <span class="dash-alert-sku">${a.sku}</span>
+          <span class="dash-alert-name">${(a.name||'').slice(0,40)}</span>
+          <span style="font-size:10px;color:#a8a29e;margin-right:6px">${a.mp}</span>
+          <span class="dash-alert-val red">$${a.current.toFixed(2)} <span style="font-size:10px">(calc: $${a.calc.toFixed(2)})</span></span>
+        </div>`
+      ).join('') + (marginAlerts.length > 50 ? `<div style="font-size:11px;color:#a8a29e;padding:8px 0">...e mais ${marginAlerts.length-50} produtos</div>` : '');
+
+  // Divergence alerts
+  divAlerts.sort((a,b) => b.pct - a.pct);
+  document.getElementById('dash-div-body').innerHTML = divAlerts.length === 0
+    ? '<div style="font-size:13px;color:#22c55e;padding:8px 0">✓ Nenhuma divergência significativa de preços</div>'
+    : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px">` +
+      divAlerts.slice(0,60).map(a =>
+        `<div style="border:1px solid #e7e5e4;border-radius:8px;padding:10px 14px;cursor:pointer" onclick="showProduct('${a.cod}')">
+          <div style="font-family:monospace;font-size:12px;font-weight:700;color:#1d4ed8">${a.sku}</div>
+          <div style="font-size:11px;color:#57534e;margin:3px 0">${(a.name||'').slice(0,45)}</div>
+          <div style="font-size:12px;font-weight:700;color:#f59e0b">$${a.mn.toFixed(2)} – $${a.mx.toFixed(2)} <span style="font-size:10px">(${a.pct.toFixed(1)}%)</span></div>
+        </div>`
+      ).join('') + '</div>';
+
+  // Categories
+  const sortedCats = Object.entries(catCounts).sort((a,b) => b[1]-a[1]);
+  const maxCat = sortedCats[0]?.[1] || 1;
+  document.getElementById('dash-cats-body').innerHTML = sortedCats.map(([cat, count]) =>
+    `<div class="dash-cat-row" style="cursor:pointer" onclick="switchModule('produtos');setTimeout(()=>openCategory('${cat.replace(/'/g,"\'")}'),100)">
+      <span class="dash-cat-name">${cat}</span>
+      <div class="dash-cat-bar-wrap"><div class="dash-cat-bar" style="width:${count/maxCat*100}%"></div></div>
+      <span class="dash-cat-count">${count.toLocaleString()}</span>
+    </div>`
+  ).join('');
+}
+
+// ── EXPORT PRECIFICAÇÃO ──
+function exportPrecificacao() {
+  if (!PI || !PX || !MP) { alert('Dados não carregados ainda.'); return; }
+  if (typeof XLSX === 'undefined') { alert('Biblioteca XLSX não carregada.'); return; }
+
+  const MKP_ORDER = [
+    {key:'Stock AC',    mp:'Stock',         label:'eBay Stock'},
+    {key:'QUALY AIR',   mp:'Qualy',         label:'eBay Qualy'},
+    {key:'Qualy Air - Amazon US', mp:'Amazon', label:'Amazon'},
+    {key:'Qualy Air Shopify', mp:'Shopify',  label:'Shopify'},
+    {key:'Walmart US',  mp:'Walmart',        label:'Walmart'},
+    {key:'Ebay-Forceparts', mp:'AmericanForce', label:'Am. Force'},
+  ];
+
+  const rows = [['Cód. Product','SKU','Nome','Categoria','Status','Fornecedor','Custo','Frete',
+    ...MKP_ORDER.flatMap(m => [m.label+' (Calculado)', m.label+' (Atual)', m.label+' (Diferença)'])
+  ]];
+
+  for (const [cod, prod] of Object.entries(PI)) {
+    if (prod.paused) continue;
+    const px = PX[cod];
+    const psku = prod.sku;
+    const row = [cod, psku, prod.name||'', prod.cat||'', px?.status||'', px?.sup||'', px?.cost||'', px?.ship||''];
+    MKP_ORDER.forEach(m => {
+      const calc = px?.prices?.[m.key] || '';
+      const mpItem = (MP[psku.toUpperCase()]||[]).find(x=>x.mp===m.mp);
+      const atual = mpItem?.p || '';
+      const diff = calc && atual ? (atual - calc).toFixed(2) : '';
+      row.push(calc, atual, diff);
+    });
+    rows.push(row);
+  }
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = rows[0].map((_,i) => ({wch: i < 4 ? 20 : 14}));
+  XLSX.utils.book_append_sheet(wb, ws, 'Precificação');
+  XLSX.writeFile(wb, 'precificacao_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
 
 // ── INIT ──
