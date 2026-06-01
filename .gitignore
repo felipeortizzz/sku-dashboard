@@ -1,8 +1,6 @@
 # Banco de dados (gerado automaticamente)
 data/db/
 
-# Dados exportados (gerados automaticamente)
-frontend/data/
 
 # Python
 __pycache__/
