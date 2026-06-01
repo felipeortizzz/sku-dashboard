@@ -1,0 +1,4 @@
+/data/*.json.gz
+  Content-Type: application/json
+  Content-Encoding: gzip
+  Cache-Control: public, max-age=3600
