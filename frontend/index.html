@@ -45,7 +45,38 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f6f6f5;color:#1c1917;mi
 .module{display:none;}
 .module.active{display:block;}
 
-/* ── LOADING (Produtos) ── */
+/* ── CATEGORY LIST PAGE ── */
+.cat-list-page{display:none;max-width:860px;margin:0 auto;padding:24px 20px;}
+.cat-list-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.cat-list-header h2{font-size:18px;font-weight:700;}
+.cat-list-header .cat-badge{background:#f5f5f4;border:1px solid #e7e5e4;border-radius:6px;padding:4px 10px;font-size:12px;color:#57534e;}
+.cat-table-wrap{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;}
+.cat-table-search{padding:14px 18px;border-bottom:1px solid #f5f5f4;display:flex;gap:8px;}
+.cat-table-search input{flex:1;border:1px solid #e7e5e4;border-radius:6px;padding:8px 12px;font-size:13px;outline:none;}
+.cat-table-search input:focus{border-color:#a8a29e;}
+
+/* ── MARGIN MODULE ── */
+.margin-module{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.margin-head{padding:14px 18px;border-bottom:1px solid #f5f5f4;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
+.margin-head h3{font-size:13px;font-weight:700;flex:1;}
+.margin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
+.margin-tile{padding:14px 18px;border-right:1px solid #f0efee;border-bottom:1px solid #f0efee;}
+.margin-tile:nth-child(3n){border-right:none;}
+.margin-mp-name{font-size:10px;font-weight:700;margin-bottom:8px;}
+.margin-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.margin-label{font-size:11px;color:#78716c;}
+.margin-val{font-size:12px;font-weight:700;}
+.margin-bar-wrap{height:6px;background:#f0efee;border-radius:3px;margin-top:6px;overflow:hidden;}
+.margin-bar{height:100%;border-radius:3px;transition:width .3s;}
+.margin-ok{background:#22c55e;}
+.margin-warn{background:#f59e0b;}
+.margin-bad{background:#ef4444;}
+.margin-na{font-size:12px;color:#a8a29e;}
+
+/* status colors in cat table */
+.status-ok-dot{width:6px;height:6px;background:#22c55e;border-radius:50%;display:inline-block;margin-right:4px;}
+.status-warn-dot{width:6px;height:6px;background:#f59e0b;border-radius:50%;display:inline-block;margin-right:4px;}
+.status-gray-dot{width:6px;height:6px;background:#d4d4d4;border-radius:50%;display:inline-block;margin-right:4px;}
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100vh - 52px);gap:14px;}
 .spinner{width:32px;height:32px;border:3px solid #e7e5e4;border-top-color:#1c1917;border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -69,9 +100,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f6f6f5;color:#1c1917;mi
 .prog{width:200px;height:3px;background:#e7e5e4;border-radius:2px;overflow:hidden;}
 .prog-fill{height:100%;background:#1c1917;border-radius:2px;transition:width .3s;}
 
-.search-page{max-width:620px;margin:80px auto;padding:0 20px;}
+.search-page{max-width:860px;margin:40px auto;padding:0 20px;}
 .search-page h2{font-size:22px;font-weight:700;margin-bottom:6px;}
 .search-page>p{font-size:14px;color:#78716c;margin-bottom:24px;}
+.cat-card{background:#fff;border:1px solid #e7e5e4;border-radius:8px;padding:10px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.cat-card:hover{border-color:#1c1917;background:#fafaf9;}
+.cat-name{font-size:12px;font-weight:600;color:#1c1917;}
+.cat-count{font-size:11px;color:#a8a29e;background:#f5f5f4;border-radius:10px;padding:1px 7px;white-space:nowrap;}
 .search-row{display:flex;gap:8px;}
 input[type=text]{flex:1;border:1px solid #e7e5e4;border-radius:8px;padding:11px 14px;font-size:14px;color:#1c1917;background:#fff;outline:none;transition:border-color .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);}
 input[type=text]:focus{border-color:#a8a29e;}
@@ -296,7 +331,31 @@ tr:hover td{background:#fafaf9;}
       <div class="prog"><div class="prog-fill" id="pbar" style="width:0%"></div></div>
     </div>
 
-    <div id="search-page" style="display:none">
+    <!-- CATEGORY LIST PAGE -->
+    <div id="cat-list-page" class="cat-list-page">
+      <div class="cat-list-header">
+        <button class="back-btn" onclick="goBackFromCat()" style="font-size:13px;color:#78716c;border:none;background:none;cursor:pointer;">&#8592; Voltar</button>
+        <h2 id="cat-list-title">Categoria</h2>
+        <span class="cat-badge" id="cat-list-count"></span>
+      </div>
+      <div class="cat-table-wrap">
+        <div class="cat-table-search">
+          <input type="text" id="cat-search-q" placeholder="Buscar SKU ou nome do produto..." oninput="filterCatList()" />
+        </div>
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th style="text-align:left;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;padding:0 18px 10px;letter-spacing:.04em;">SKU</th>
+              <th style="text-align:left;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;padding:0 18px 10px;letter-spacing:.04em;">Produto</th>
+              <th style="text-align:left;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;padding:0 18px 10px;letter-spacing:.04em;">Status</th>
+              <th style="text-align:left;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;padding:0 18px 10px;letter-spacing:.04em;">Custo</th>
+              <th style="width:80px;"></th>
+            </tr>
+          </thead>
+          <tbody id="cat-list-body"></tbody>
+        </table>
+      </div>
+    </div>
       <div class="search-page">
         <h2>Buscar produto</h2>
         <p>Pesquise por Cód. Product, SKU principal ou qualquer SKU equivalente de fornecedor.</p>
@@ -312,6 +371,10 @@ tr:hover td{background:#fafaf9;}
           <span class="chip" onclick="ex(this)">F4485A</span>
           <span class="chip" onclick="ex(this)">6511616</span>
         </div>
+        <div style="margin-top:28px;border-top:1px solid #e7e5e4;padding-top:24px;">
+          <div style="font-size:13px;font-weight:600;color:#1c1917;margin-bottom:12px;">Ou filtre por categoria</div>
+          <div id="cat-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;"></div>
+        </div>
       </div>
     </div>
 
@@ -326,7 +389,8 @@ tr:hover td{background:#fafaf9;}
       </div>
       <div class="layout">
         <div>
-          <div id="pricing-wrapper"></div>
+          <div id="margin-wrapper"></div>
+      <div id="pricing-wrapper"></div>
           <div class="card">
             <div class="hero" id="hero"></div>
             <div class="tbl-wrap">
@@ -408,7 +472,7 @@ tr:hover td{background:#fafaf9;}
 <script>
 // ── NAVIGATION ──
 let produtosLoaded = false;
-let S2C=null,PI=null,MP=null,SUP=null,PX=null,PAUSED=null;
+let S2C=null,PI=null,MP=null,SUP=null,PX=null,PAUSED=null,TAXA=null;
 
 function switchModule(name) {
   document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
@@ -440,11 +504,13 @@ async function initProdutos(){
     txt("Carregando dados dos fornecedores...");
     SUP=await fetchData("data/suppliers.json");prg(78);
     txt("Carregando módulo de precificação...");
-    PX=await fetchData("data/pricing.json");prg(95);
+    PX=await fetchData("data/pricing.json");prg(90);
+    try{TAXA=await fetchData("data/taxa.json");}catch(e){TAXA={};}
     PAUSED=new Set(Object.keys(PI).filter(k=>PI[k].paused));prg(100);
     await new Promise(r=>setTimeout(r,150));
     document.getElementById("loading").style.display="none";
     document.getElementById("search-page").style.display="block";
+    buildCatGrid();
     document.getElementById("topbar-stats").textContent=
       Object.keys(PI).length.toLocaleString()+" produtos · "+
       Object.keys(S2C).length.toLocaleString()+" SKUs mapeados";
@@ -696,9 +762,11 @@ function showProduct(cod){
   document.getElementById("mp-panels").innerHTML=panels;
   document.getElementById("sup-body").innerHTML=renderSup(eq,psku);
   document.getElementById("pricing-wrapper").innerHTML=renderPricing(cod,psku,isPaused);
+  document.getElementById("margin-wrapper").innerHTML=renderMarginModule(cod,psku);
 
   openP=null;
   document.getElementById("search-page").style.display="none";
+  document.getElementById("cat-list-page").style.display="none";
   document.getElementById("prod-page").style.display="block";
   window.scrollTo(0,0);
 }
@@ -723,7 +791,12 @@ function togglePricing(){
   body.style.display=hidden?"block":"none";
   arrow.style.transform=hidden?"":"rotate(180deg)";
 }
-function goBack(){document.getElementById("prod-page").style.display="none";document.getElementById("search-page").style.display="block";openP=null;}
+function goBack(){
+  document.getElementById("prod-page").style.display="none";
+  document.getElementById("cat-list-page").style.display="none";
+  document.getElementById("search-page").style.display="block";
+  openP=null;
+}
 function ex(el){document.getElementById("q").value=el.textContent;doSearch();}
 
 // ── CRUZAMENTO JS ──
@@ -1073,6 +1146,172 @@ function toggleSidebar(){
   sidebar.classList.toggle('collapsed');
   main.classList.toggle('expanded');
   icon.innerHTML=sidebar.classList.contains('collapsed')?'&#9776;':'&#9776;';
+}
+
+// ── CATEGORY FILTER ──
+let currentCatProducts = [];
+let currentCatName = '';
+
+function buildCatGrid() {
+  const cats = {};
+  for (const [cod, prod] of Object.entries(PI)) {
+    const cat = prod.cat || 'Outros';
+    if (!cats[cat]) cats[cat] = 0;
+    cats[cat]++;
+  }
+  const sorted = Object.entries(cats).sort((a, b) => b[1] - a[1]);
+  const grid = document.getElementById('cat-grid');
+  if (!grid) return;
+  grid.innerHTML = sorted.map(([cat, count]) =>
+    `<div class="cat-card" onclick="openCategory('${cat.replace(/'/g,"\\'")}')">
+      <span class="cat-name">${cat}</span>
+      <span class="cat-count">${count.toLocaleString()}</span>
+    </div>`
+  ).join('');
+}
+
+function openCategory(cat) {
+  currentCatName = cat;
+  currentCatProducts = Object.entries(PI)
+    .filter(([, p]) => p.cat === cat)
+    .map(([cod, p]) => ({ cod, ...p, px: PX[cod] || null }));
+
+  document.getElementById('cat-list-title').textContent = cat;
+  document.getElementById('cat-list-count').textContent = currentCatProducts.length.toLocaleString() + ' produtos';
+  document.getElementById('cat-search-q').value = '';
+  renderCatList(currentCatProducts);
+
+  document.getElementById('search-page').style.display = 'none';
+  document.getElementById('cat-list-page').style.display = 'block';
+}
+
+function filterCatList() {
+  const q = document.getElementById('cat-search-q').value.toLowerCase();
+  const filtered = q
+    ? currentCatProducts.filter(p => p.sku.toLowerCase().includes(q) || (p.name || '').toLowerCase().includes(q))
+    : currentCatProducts;
+  renderCatList(filtered);
+}
+
+function renderCatList(items) {
+  const statusDot = s => s === 'OK'
+    ? '<span class="status-ok-dot"></span>'
+    : s === 'Estoque Insuficiente'
+    ? '<span class="status-warn-dot"></span>'
+    : '<span class="status-gray-dot"></span>';
+
+  document.getElementById('cat-list-body').innerHTML = items.slice(0, 300).map(p => {
+    const px = p.px;
+    const cost = px?.cost != null ? `$${px.cost.toFixed(2)}` : '—';
+    const status = px?.status || 'Sem Preço';
+    return `<tr style="cursor:pointer" onclick="showProduct('${p.cod}')" onmouseenter="this.style.background='#fafaf9'" onmouseleave="this.style.background=''">
+      <td style="padding:10px 18px;font-family:monospace;font-size:12px;font-weight:700;color:#1d4ed8;border-top:1px solid #f5f5f4;">${p.sku}</td>
+      <td style="padding:10px 18px;font-size:12px;color:#57534e;border-top:1px solid #f5f5f4;">${(p.name || '').slice(0, 60)}</td>
+      <td style="padding:10px 18px;font-size:12px;border-top:1px solid #f5f5f4;">${statusDot(status)}${status}</td>
+      <td style="padding:10px 18px;font-size:12px;font-weight:700;border-top:1px solid #f5f5f4;">${cost}</td>
+      <td style="padding:10px 18px;border-top:1px solid #f5f5f4;text-align:right;"><span style="font-size:11px;color:#a8a29e;">Ver ›</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function goBackFromCat() {
+  document.getElementById('cat-list-page').style.display = 'none';
+  document.getElementById('search-page').style.display = 'block';
+}
+
+// ── MARGIN MODULE ──
+const MKP_MAP_TAXA = {
+  'Stock':         'Stock AC',
+  'Amazon':        'Qualy Air - Amazon US',
+  'Qualy':         'QUALY AIR',
+  'AmericanForce': 'Ebay-Forceparts',
+  'Shopify':       'Qualy Air Shopify',
+  'Walmart':       'Walmart US'
+};
+
+function calcMargin(currentPrice, cost, shipping) {
+  if (!currentPrice || !cost || shipping == null) return null;
+  const totalCost = cost + shipping;
+  return ((currentPrice - totalCost) / currentPrice * 100);
+}
+
+function renderMarginModule(cod, principalSku) {
+  const px = PX[cod];
+  if (!px || !px.cost) return '';
+
+  const cat = px.cat;
+  const taxaInfo = TAXA ? TAXA[cat] : null;
+  const cost = px.cost;
+  const shipping = px.ship || 0;
+
+  const tiles = MPC.map(m => {
+    const mpKey = MKP_MAP_TAXA[m.k];
+    const taxaEntry = taxaInfo ? taxaInfo[mpKey] : null;
+    const targetMargin = taxaEntry ? (taxaEntry.l * 100) : null;
+
+    // Get current price from MP
+    const mpData = mpFor(principalSku);
+    const mpItem = mpData.find(x => x.mp === m.k);
+    const currentPrice = mpItem?.p;
+    const actualMargin = calcMargin(currentPrice, cost, shipping);
+
+    let content = '';
+    if (currentPrice == null) {
+      content = `<div class="margin-na">Não listado</div>`;
+    } else if (actualMargin == null) {
+      content = `<div class="margin-na">Sem custo</div>`;
+    } else {
+      const diff = targetMargin != null ? actualMargin - targetMargin : null;
+      const barColor = actualMargin < 0 ? 'margin-bad' : diff != null && diff < -5 ? 'margin-warn' : 'margin-ok';
+      const barWidth = Math.min(Math.max(actualMargin, 0), 60) / 60 * 100;
+
+      content = `
+        <div class="margin-row">
+          <span class="margin-label">Margem atual</span>
+          <span class="margin-val" style="color:${actualMargin < 0 ? '#ef4444' : actualMargin < 10 ? '#f59e0b' : '#22c55e'}">${actualMargin.toFixed(1)}%</span>
+        </div>
+        ${targetMargin != null ? `
+        <div class="margin-row">
+          <span class="margin-label">Margem alvo</span>
+          <span class="margin-val" style="color:#78716c">${targetMargin.toFixed(1)}%</span>
+        </div>
+        ${diff != null ? `
+        <div class="margin-row">
+          <span class="margin-label">Diferença</span>
+          <span class="margin-val" style="color:${diff >= 0 ? '#22c55e' : '#ef4444'}">${diff > 0 ? '+' : ''}${diff.toFixed(1)}%</span>
+        </div>` : ''}` : ''}
+        <div class="margin-bar-wrap"><div class="margin-bar ${barColor}" style="width:${barWidth}%"></div></div>
+        <div style="font-size:10px;color:#a8a29e;margin-top:4px;">Preço: $${currentPrice.toFixed(2)}</div>
+      `;
+    }
+
+    return `<div class="margin-tile">
+      <div class="margin-mp-name" style="color:${m.c}">${m.l}</div>
+      ${content}
+    </div>`;
+  }).join('');
+
+  return `<div class="margin-module">
+    <div class="margin-head" onclick="toggleMargin()">
+      <h3>📊 Margem atual vs Margem alvo</h3>
+      <span id="margin-arrow" style="font-size:13px;color:#a8a29e;transition:transform .2s;display:inline-block;">&#9650;</span>
+    </div>
+    <div id="margin-body">
+      <div style="padding:10px 18px 0;font-size:11px;color:#78716c;">
+        Custo: <b>$${cost.toFixed(2)}</b> · Frete: <b>$${shipping.toFixed(2)}</b> · Custo total: <b>$${(cost+shipping).toFixed(2)}</b> · Fornecedor: <b>${px.sup || '—'}</b>
+      </div>
+      <div class="margin-grid" style="margin-top:12px;">${tiles}</div>
+    </div>
+  </div>`;
+}
+
+function toggleMargin() {
+  const body = document.getElementById('margin-body');
+  const arrow = document.getElementById('margin-arrow');
+  if (!body) return;
+  const hidden = body.style.display === 'none';
+  body.style.display = hidden ? 'block' : 'none';
+  arrow.style.transform = hidden ? '' : 'rotate(180deg)';
 }
 
 // ── INIT ──
