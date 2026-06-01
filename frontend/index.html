@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CM Compressor — Sistema</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* ── RESET ── */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f6f6f5;color:#1c1917;min-height:100vh;display:flex;flex-direction:column;}
+
+/* ── TOPBAR ── */
+.topbar{background:#1c1917;height:52px;display:flex;align-items:center;padding:0 20px;gap:14px;position:fixed;top:0;left:0;right:0;z-index:200;}
+.topbar-logo{width:30px;height:30px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#1c1917;font-size:14px;font-weight:900;flex-shrink:0;}
+.topbar-title{font-size:14px;font-weight:700;color:#fff;}
+.topbar-stats{margin-left:auto;font-size:11px;color:#78716c;}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:52px;left:0;bottom:0;width:220px;background:#fff;border-right:1px solid #e7e5e4;display:flex;flex-direction:column;z-index:100;}
+.sidebar-section{padding:16px 12px 6px;font-size:10px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.06em;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;margin:2px 8px;border-radius:8px;cursor:pointer;font-size:13px;color:#57534e;transition:background .15s,color .15s;border:none;background:none;width:calc(100% - 16px);text-align:left;}
+.nav-item:hover{background:#f5f5f4;color:#1c1917;}
+.nav-item.active{background:#1c1917;color:#fff;font-weight:600;}
+.nav-item .nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.nav-item .nav-badge{margin-left:auto;font-size:10px;background:#e7e5e4;color:#78716c;padding:1px 6px;border-radius:10px;}
+.nav-item.active .nav-badge{background:#ffffff22;color:#fff;}
+.sidebar-footer{margin-top:auto;padding:12px 16px;border-top:1px solid #f5f5f4;font-size:11px;color:#a8a29e;}
+
+/* ── MAIN CONTENT ── */
+.main{margin-left:220px;margin-top:52px;min-height:calc(100vh - 52px);}
+
+/* ── MODULE WRAPPER ── */
+.module{display:none;}
+.module.active{display:block;}
+
+/* ── LOADING (Produtos) ── */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100vh - 52px);gap:14px;}
+.spinner{width:32px;height:32px;border:3px solid #e7e5e4;border-top-color:#1c1917;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading p{font-size:13px;color:#78716c;}
+.prog{width:200px;height:3px;background:#e7e5e4;border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:#1c1917;border-radius:2px;transition:width .3s;}
+
+/* ── PRODUTOS MODULE CSS ── */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f6f6f5;color:#1c1917;min-height:100vh;}
+
+.topbar{background:#fff;border-bottom:1px solid #e7e5e4;padding:0 28px;display:flex;align-items:center;gap:14px;height:56px;position:sticky;top:0;z-index:100;}
+.topbar-logo{width:32px;height:32px;background:#1c1917;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex-shrink:0;}
+.topbar h1{font-size:15px;font-weight:700;}
+.topbar-stats{margin-left:auto;font-size:11px;color:#a8a29e;}
+
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100vh - 56px);gap:14px;}
+.spinner{width:32px;height:32px;border:3px solid #e7e5e4;border-top-color:#1c1917;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading p{font-size:13px;color:#78716c;}
+.prog{width:200px;height:3px;background:#e7e5e4;border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:#1c1917;border-radius:2px;transition:width .3s;}
+
+.search-page{max-width:620px;margin:80px auto;padding:0 20px;}
+.search-page h2{font-size:22px;font-weight:700;margin-bottom:6px;}
+.search-page>p{font-size:14px;color:#78716c;margin-bottom:24px;}
+.search-row{display:flex;gap:8px;}
+input[type=text]{flex:1;border:1px solid #e7e5e4;border-radius:8px;padding:11px 14px;font-size:14px;color:#1c1917;background:#fff;outline:none;transition:border-color .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+input[type=text]:focus{border-color:#a8a29e;}
+input[type=text]::placeholder{color:#a8a29e;}
+.btn{background:#1c1917;color:#fff;border:none;border-radius:8px;padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer;}
+.btn:hover{background:#292524;}
+.btn-sm{background:#fff;color:#57534e;border:1px solid #e7e5e4;border-radius:6px;padding:7px 13px;font-size:13px;font-weight:500;cursor:pointer;}
+.btn-sm:hover{background:#fafaf9;}
+.chips{margin-top:14px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.chip-lbl{font-size:11px;color:#a8a29e;}
+.chip{background:#fff;border:1px solid #e7e5e4;border-radius:5px;padding:3px 9px;font-size:12px;color:#57534e;cursor:pointer;font-family:monospace;}
+.chip:hover{border-color:#a8a29e;color:#1c1917;}
+
+.prod-page{display:none;}
+.sub-bar{background:#fff;border-bottom:1px solid #e7e5e4;padding:0 20px;display:flex;align-items:center;gap:12px;height:46px;position:sticky;top:56px;z-index:99;}
+.back-btn{border:none;background:none;font-size:13px;color:#78716c;cursor:pointer;}
+.back-btn:hover{color:#1c1917;}
+.breadcrumb{font-size:13px;color:#a8a29e;}
+.breadcrumb b{color:#1c1917;}
+.sub-bar-search{margin-left:auto;display:flex;gap:8px;}
+.mini-in{border:1px solid #e7e5e4;border-radius:6px;padding:6px 10px;font-size:13px;color:#1c1917;background:#fff;outline:none;width:200px;}
+.mini-in:focus{border-color:#a8a29e;}
+
+.layout{max-width:1140px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr 340px;gap:18px;}
+@media(max-width:820px){.layout{grid-template-columns:1fr;}}
+
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.card:last-child{margin-bottom:0;}
+.card-head{padding:14px 18px;border-bottom:1px solid #f5f5f4;display:flex;align-items:center;gap:8px;}
+.card-head h3{font-size:13px;font-weight:700;flex:1;}
+.cnt{font-size:11px;color:#a8a29e;background:#f5f5f4;border-radius:10px;padding:2px 7px;}
+
+.hero{padding:18px 18px 14px;border-bottom:1px solid #f5f5f4;}
+.prod-name{font-size:17px;font-weight:700;line-height:1.4;margin-bottom:10px;}
+.tags{display:flex;gap:6px;flex-wrap:wrap;}
+.tag{display:inline-block;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600;}
+.t-dark{background:#1c1917;color:#fff;}
+.t-blue{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}
+.t-gray{background:#f5f5f4;color:#57534e;border:1px solid #e7e5e4;}
+.t-warn{background:#fffbeb;color:#b45309;border:1px solid #fde68a;}
+.t-ok{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;}
+.t-red{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;}
+.t-purple{background:#fdf4ff;color:#7c3aed;border:1px solid #e9d5ff;}
+
+.tbl-wrap{padding:14px 18px;}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#78716c;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.04em;padding:0 10px 8px;}
+td{padding:9px 10px;font-size:13px;border-top:1px solid #f5f5f4;vertical-align:middle;}
+tr:hover td{background:#fafaf9;}
+.mono-b{font-family:monospace;font-weight:700;color:#1d4ed8;}
+.mono-p{font-family:monospace;font-weight:700;color:#7c3aed;}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;margin-right:4px;}
+.b-blue{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}
+.b-purp{background:#fdf4ff;color:#7c3aed;border:1px solid #e9d5ff;}
+.sup-tag{display:inline-block;background:#f5f5f4;border:1px solid #e7e5e4;border-radius:4px;padding:2px 7px;font-size:11px;color:#57534e;}
+.dots{display:flex;gap:3px;align-items:center;flex-wrap:wrap;}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dg{background:#22c55e;}.dr{background:#ef4444;}.dy{background:#f59e0b;}.dz{background:#d4d4d4;}
+.dot-diff{width:7px;height:7px;border-radius:50%;background:#f97316;flex-shrink:0;}
+.row-diff-pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;border-radius:4px;padding:1px 6px;margin-left:6px;}
+
+.mp-panel{display:none;background:#fafaf9;border-top:1px solid #f0efee;padding:14px 18px;}
+.mp-panel.open{display:block;}
+.mp-sku-lbl{font-size:11px;color:#a8a29e;font-family:monospace;margin-bottom:10px;}
+.mp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.mp-tile{background:#fff;border:1px solid #e7e5e4;border-radius:8px;padding:10px 12px;position:relative;}
+.mp-tile.found{border-left:3px solid;}
+.mp-tile.diff{border-top:2.5px solid #f97316;background:#fff8f3;}
+.mp-tile.diff .mp-price{color:#c2410c;}
+.mp-tile.cheapest{border-top:2.5px solid #16a34a;}
+.mp-tile.cheapest .mp-price{color:#15803d;}
+.diff-badge{position:absolute;top:6px;right:6px;background:#f97316;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;}
+.cheapest-badge{position:absolute;top:6px;right:6px;background:#16a34a;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;}
+.mp-label{font-size:10px;font-weight:700;margin-bottom:4px;}
+.mp-price{font-size:17px;font-weight:700;color:#1c1917;}
+.mp-na{font-size:12px;color:#a8a29e;}
+.mp-qty{font-size:10px;color:#a8a29e;margin-top:1px;}
+.mp-extra{font-size:10px;color:#a8a29e;margin-top:2px;}
+.price-summary{margin-top:10px;padding-top:10px;border-top:1px solid #ece9e6;display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
+.ps-item{font-size:11px;color:#78716c;}
+.ps-item b{color:#1c1917;}
+.ps-diff{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;}
+.ps-diff.ok{background:#f0fdf4;color:#15803d;}
+.ps-diff.warn{background:#fff7ed;color:#c2410c;}
+
+.tog-btn{background:none;border:1px solid #e7e5e4;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:600;color:#57534e;cursor:pointer;}
+.tog-btn:hover{background:#f5f5f4;}
+.tog-btn.on{background:#1c1917;color:#fff;border-color:#1c1917;}
+
+/* ── PRICING MODULE ── */
+.pricing-module{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.pricing-head{padding:14px 18px;border-bottom:1px solid #f5f5f4;display:flex;align-items:center;gap:10px;}
+.pricing-head h3{font-size:13px;font-weight:700;flex:1;}
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.status-ok{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;}
+.status-insuf{background:#fffbeb;color:#b45309;border:1px solid #fde68a;}
+.status-sem{background:#f5f5f4;color:#78716c;border:1px solid #e7e5e4;}
+.pricing-meta{padding:12px 18px;background:#fafaf9;border-bottom:1px solid #f0efee;display:flex;gap:20px;flex-wrap:wrap;}
+.pm-item{font-size:12px;color:#57534e;}
+.pm-item b{color:#1c1917;font-weight:700;}
+.pm-label{font-size:10px;color:#a8a29e;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
+.price-calc-tile{padding:14px 18px;border-right:1px solid #f0efee;border-bottom:1px solid #f0efee;}
+.price-calc-tile:nth-child(3n){border-right:none;}
+.price-calc-tile:last-child,.price-calc-tile:nth-last-child(2),.price-calc-tile:nth-last-child(3){border-bottom:none;}
+.pct-mp-name{font-size:10px;font-weight:700;margin-bottom:6px;}
+.pct-price{font-size:20px;font-weight:700;color:#1c1917;}
+.pct-price.no-price{font-size:13px;color:#a8a29e;font-weight:400;}
+.pct-detail{font-size:10px;color:#a8a29e;margin-top:3px;}
+.pct-vs{display:flex;align-items:center;gap:5px;margin-top:6px;flex-wrap:wrap;}
+.vs-label{font-size:10px;color:#a8a29e;}
+.vs-price{font-size:11px;font-weight:700;}
+.vs-above{color:#ef4444;}
+.vs-below{color:#22c55e;}
+.vs-equal{color:#a8a29e;}
+.vs-none{color:#d4d4d4;}
+
+.card-body{padding:4px 18px 16px;}
+.sup-row{padding:12px 0;border-top:1px solid #f5f5f4;}
+.sup-row:first-child{border-top:none;}
+.sup-name-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.sup-name{font-size:12px;font-weight:700;}
+.sup-sku{font-family:monospace;font-size:11px;color:#78716c;}
+.sup-details{display:flex;gap:12px;flex-wrap:wrap;}
+.sup-stat{font-size:12px;color:#57534e;}
+.sup-stat b{color:#1c1917;}
+.wh-pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+.wh-pill{font-size:10px;background:#f5f5f4;border:1px solid #e7e5e4;border-radius:4px;padding:2px 6px;color:#57534e;}
+.wh-pill.stk{background:#f0fdf4;border-color:#bbf7d0;color:#15803d;}
+.wh-pill.low{background:#fefce8;border-color:#fef08a;color:#854d0e;}
+.no-sup{font-size:13px;color:#a8a29e;padding:12px 0;}
+
+/* ── CRUZAMENTO MODULE CSS ── */
+/* Scoped to .module-cruz to avoid conflicts */
+.module-cruz .app{max-width:none;margin:0;padding:1.5rem;}
+.module-cruz h1{font-size:20px;font-weight:600;margin-bottom:.25rem;}
+.module-cruz .subtitle{font-size:13px;color:#666;margin-bottom:1.5rem;}
+.module-cruz .section{background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:1.25rem;margin-bottom:1rem;}
+.module-cruz .section-title{font-size:12px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.04em;margin-bottom:1rem;}
+.module-cruz .supplier-card{border:1px solid #e8e8e8;border-radius:8px;padding:1rem;margin-bottom:.75rem;background:#fafafa;}
+.module-cruz .supplier-header{display:flex;align-items:center;gap:10px;margin-bottom:.75rem;}
+.module-cruz .supplier-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;color:#fff;}
+.module-cruz .supplier-name{font-size:14px;font-weight:600;}
+.module-cruz .supplier-meta{font-size:12px;color:#888;}
+.module-cruz .col-map{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:.75rem;}
+.module-cruz .col-map label{font-size:11px;color:#666;display:block;margin-bottom:3px;font-weight:500;}
+.module-cruz .col-map select{width:100%;font-size:12px;padding:5px 7px;border:1px solid #ddd;border-radius:6px;background:#fff;}
+.module-cruz .drop-zone{border:2px dashed #ccc;border-radius:8px;padding:2.5rem;text-align:center;cursor:pointer;transition:background .15s,border-color .15s;}
+.module-cruz .drop-zone:hover,.module-cruz .drop-zone.over{background:#f0f7ff;border-color:#4a90d9;}
+.module-cruz .drop-zone p{font-size:13px;color:#888;margin-top:.5rem;}
+.module-cruz .drop-zone .icon{font-size:32px;margin-bottom:.5rem;}
+.module-cruz .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem;}
+.module-cruz .stat{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:.85rem 1rem;text-align:center;}
+.module-cruz .stat-num{font-size:24px;font-weight:700;color:#1a1a1a;}
+.module-cruz .stat-lbl{font-size:11px;color:#888;margin-top:2px;}
+.module-cruz .tab-bar{display:flex;gap:4px;margin-bottom:1rem;border-bottom:1px solid #eee;padding-bottom:.5rem;}
+.module-cruz .tab{font-size:13px;padding:6px 14px;border-radius:6px;cursor:pointer;border:1px solid transparent;color:#666;background:none;}
+.module-cruz .tab.active{background:#f0f0f0;border-color:#ddd;color:#1a1a1a;font-weight:600;}
+.module-cruz table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;}
+.module-cruz th{text-align:left;font-size:11px;font-weight:600;color:#666;padding:7px 10px;border-bottom:1px solid #eee;background:#fafafa;}
+.module-cruz td{padding:7px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top;word-break:break-word;}
+.module-cruz tr:hover td{background:#fafafa;}
+.module-cruz .badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;margin:1px;}
+.module-cruz .badge-match{background:#e6f4ea;color:#2e7d32;}
+.module-cruz .badge-only{background:#fff8e1;color:#f57f17;}
+.module-cruz .search-bar{display:flex;gap:8px;margin-bottom:1rem;}
+.module-cruz .search-bar input,.module-cruz .search-bar select{padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;}
+.module-cruz .search-bar input{flex:1;}
+.module-cruz .empty-state{text-align:center;padding:3rem;color:#999;font-size:13px;}
+.module-cruz .alert{padding:.75rem 1rem;border-radius:8px;font-size:13px;margin-bottom:.75rem;}
+.module-cruz .alert-info{background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9;}
+.module-cruz .action-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:1rem;}
+.module-cruz .btn{padding:8px 18px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;}
+.module-cruz .btn-primary{background:#1a1a1a;color:#fff;}
+.module-cruz .btn-primary:hover{background:#333;}
+.module-cruz .btn-secondary{background:#fff;color:#1a1a1a;border:1px solid #ddd;}
+.module-cruz .btn-secondary:hover{background:#f5f5f5;}
+.module-cruz .btn-danger{background:#fff;color:#d32f2f;border:1px solid #f5c6c6;padding:5px 10px;font-size:12px;border-radius:6px;cursor:pointer;font-weight:500;}
+.module-cruz .tag{display:inline-block;background:#f0f0f0;border-radius:10px;font-size:10px;padding:2px 7px;color:#555;margin:1px;}
+.module-cruz .tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid #eee;}
+.module-cruz .mono{font-family:monospace;font-weight:600;font-size:11px;}
+.module-cruz .gap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;}
+.module-cruz .gap-item{padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:12px;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">CM</div>
+  <span class="topbar-title">CM Compressor</span>
+  <div class="topbar-stats" id="topbar-stats"></div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-section">Menu</div>
+  <button class="nav-item active" id="nav-produtos" onclick="switchModule('produtos')">
+    <span class="nav-icon">📦</span>
+    Produtos
+  </button>
+  <button class="nav-item" id="nav-cruzamento" onclick="switchModule('cruzamento')">
+    <span class="nav-icon">🔗</span>
+    Cruzamento de Peças
+  </button>
+  <div class="sidebar-footer">v1.0 · CM Compressor</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ── MÓDULO: PRODUTOS ── -->
+  <div class="module active" id="module-produtos">
+
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <p id="load-txt">Inicializando...</p>
+      <div class="prog"><div class="prog-fill" id="pbar" style="width:0%"></div></div>
+    </div>
+
+    <div id="search-page" style="display:none">
+      <div class="search-page">
+        <h2>Buscar produto</h2>
+        <p>Pesquise por Cód. Product, SKU principal ou qualquer SKU equivalente de fornecedor.</p>
+        <div class="search-row">
+          <input type="text" id="q" placeholder="Ex: DS100279, 30837, CO 4626C..." />
+          <button class="btn" onclick="doSearch()">Buscar</button>
+        </div>
+        <div class="chips">
+          <span class="chip-lbl">Exemplos:</span>
+          <span class="chip" onclick="ex(this)">DS100279</span>
+          <span class="chip" onclick="ex(this)">30837</span>
+          <span class="chip" onclick="ex(this)">CO 4626C</span>
+          <span class="chip" onclick="ex(this)">F4485A</span>
+          <span class="chip" onclick="ex(this)">6511616</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="prod-page" class="prod-page">
+      <div class="sub-bar">
+        <button class="back-btn" onclick="goBack()">&#8592; Voltar</button>
+        <span class="breadcrumb">Produto / <b id="bc-sku">&#8212;</b></span>
+        <div class="sub-bar-search">
+          <input type="text" class="mini-in" id="mini-q" placeholder="Buscar outro SKU..." />
+          <button class="btn-sm" onclick="doMini()">Buscar</button>
+        </div>
+      </div>
+      <div class="layout">
+        <div>
+          <div id="pricing-wrapper"></div>
+          <div class="card">
+            <div class="hero" id="hero"></div>
+            <div class="tbl-wrap">
+              <div class="legend">
+                <span class="leg-item"><span class="dot dg"></span>MP listado</span>
+                <span class="leg-item"><span class="dot dz"></span>MP não listado</span>
+                <span class="leg-item"><span class="dot dy"></span>Fornec. c/ estoque</span>
+                <span class="leg-item"><span class="dot dr"></span>Fornec. s/ estoque</span>
+                <span class="leg-item"><span class="dot-diff"></span>Preço divergente</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:155px">SKU</th>
+                    <th style="width:210px">Tipo / Supplier</th>
+                    <th style="width:100px">Marketplace</th>
+                    <th style="width:80px">Fornecedor</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="sku-rows"></tbody>
+              </table>
+            </div>
+            <div id="mp-panels"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-head"><h3>Fornecedores</h3><span class="cnt" id="sup-cnt">0</span></div>
+            <div class="card-body" id="sup-body"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /module-produtos -->
+
+  <!-- ── MÓDULO: CRUZAMENTO ── -->
+  <div class="module module-cruz" id="module-cruzamento">
+    <div class="app">
+  <h1>🔗 Cruzamento de Peças</h1>
+  <p class="subtitle">Vincule peças de múltiplos fornecedores pelo número OEM</p>
+
+  <div class="section" id="upload-section">
+    <div class="section-title">Fornecedores carregados</div>
+    <div id="suppliers-list"></div>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+      <input type="file" id="file-input" accept=".xlsx,.xls,.csv" multiple onchange="handleFiles(this.files)">
+      <div class="icon">📂</div>
+      <strong>Arraste arquivos aqui ou clique para selecionar</strong>
+      <p>.xlsx · .xls · .csv — vários arquivos ao mesmo tempo</p>
+    </div>
+    <div class="action-row" id="run-row" style="display:none">
+      <button class="btn btn-primary" onclick="runCrossRef()">⚡ Cruzar peças</button>
+      <button class="btn btn-secondary" onclick="clearAll()">🗑 Limpar tudo</button>
+      <span id="status-msg" style="font-size:12px;color:#888"></span>
+    </div>
+  </div>
+
+  <div id="results-section" style="display:none">
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="section">
+      <div class="tab-bar">
+        <button class="tab active" onclick="switchTab('matches')" id="tab-matches">✅ Peças em comum</button>
+        <button class="tab" onclick="switchTab('catalog')" id="tab-catalog">📦 Catálogo unificado</button>
+        <button class="tab" onclick="switchTab('gaps')" id="tab-gaps">⚠️ Gaps</button>
+      </div>
+      <div id="tab-content"></div>
+    </div>
+    <div class="action-row">
+      <button class="btn btn-secondary" onclick="exportResults()">⬇️ Exportar para Excel</button>
+    </div>
+  </div>
+</div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ── NAVIGATION ──
+let produtosLoaded = false;
+let S2C=null,PI=null,MP=null,SUP=null,PX=null,PAUSED=null;
+
+function switchModule(name) {
+  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('module-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'produtos' && !produtosLoaded) {
+    initProdutos();
+  }
+}
+
+// ── PRODUTOS JS ──
+async function fetchData(url){
+  const resp=await fetch(url);
+  if(!resp.ok)throw new Error("Falha ao carregar: "+url);
+  const buf=await resp.arrayBuffer();
+  const ds=new DecompressionStream("gzip");
+  const w=ds.writable.getWriter();
+  w.write(new Uint8Array(buf));w.close();
+  const chunks=[],r=ds.readable.getReader();
+  while(true){const{done,value}=await r.read();if(done)break;chunks.push(value);}
+  const tot=chunks.reduce((a,c)=>a+c.length,0);
+  const out=new Uint8Array(tot);let off=0;
+  for(const c of chunks){out.set(c,off);off+=c.length;}
+  return JSON.parse(new TextDecoder().decode(out));
+}
+
+async function initProdutos(){
+  const txt=t=>document.getElementById("load-txt").textContent=t;
+  const prg=p=>document.getElementById("pbar").style.width=p+"%";
+  try{
+    txt("Carregando mapeamento de SKUs...");prg(8);
+    S2C=await fetchData("data/sku_map.json.gz");prg(25);
+    txt("Carregando catálogo de produtos...");
+    PI=await fetchData("data/products.json.gz");prg(45);
+    txt("Carregando preços dos Marketplaces...");
+    MP=await fetchData("data/marketplace.json.gz");prg(62);
+    txt("Carregando dados dos fornecedores...");
+    SUP=await fetchData("data/suppliers.json.gz");prg(78);
+    txt("Carregando módulo de precificação...");
+    PX=await fetchData("data/pricing.json.gz");prg(95);
+    PAUSED=new Set(Object.keys(PI).filter(k=>PI[k].paused));prg(100);
+    await new Promise(r=>setTimeout(r,150));
+    document.getElementById("loading").style.display="none";
+    document.getElementById("search-page").style.display="block";
+    document.getElementById("topbar-stats").textContent=
+      Object.keys(PI).length.toLocaleString()+" produtos · "+
+      Object.keys(S2C).length.toLocaleString()+" SKUs mapeados";
+    document.getElementById("q").focus();
+    document.getElementById("q").addEventListener("keydown",e=>{if(e.key==="Enter")doSearch();});
+    document.getElementById("mini-q").addEventListener("keydown",e=>{if(e.key==="Enter")doMini();});
+    produtosLoaded=true;
+  }catch(err){
+    document.getElementById("load-txt").textContent="Erro: "+err.message;
+    console.error(err);
+  }
+}
+
+const MPC=[
+  {k:"Stock",l:"eBay Stock",c:"#2563eb"},
+  {k:"Amazon",l:"Amazon",c:"#d97706"},
+  {k:"Qualy",l:"eBay Qualy",c:"#059669"},
+  {k:"AmericanForce",l:"Am. Force",c:"#dc2626"},
+  {k:"Shopify",l:"Shopify",c:"#96bf48"},
+  {k:"Walmart",l:"Walmart",c:"#0071ce"}
+];
+
+// Mapping from pricing marketplace name to MP key
+const MKP_MAP={
+  "Stock AC":"Stock",
+  "QUALY AIR":"Qualy",
+  "Qualy Air Shopify":"Shopify",
+  "Walmart US":"Walmart",
+  "Qualy Air - Amazon US":"Amazon",
+  "Ebay-Forceparts":"AmericanForce"
+};
+
+function mpFor(sku){return MP[sku.toUpperCase()]||[];}
+function supFor(sku){return SUP[sku.toUpperCase()]||[];}
+
+function collectAllPrices(skus){
+  const p=[];
+  skus.forEach(s=>mpFor(s).forEach(m=>{if(m.p!=null)p.push(m.p);}));
+  return p;
+}
+function median(arr){
+  if(!arr.length)return null;
+  const s=[...arr].sort((a,b)=>a-b),m=Math.floor(s.length/2);
+  return s.length%2?s[m]:(s[m-1]+s[m])/2;
+}
+function mpDots(sku){
+  const f={};for(const m of mpFor(sku))f[m.mp]=true;
+  return MPC.map(m=>`<span class="dot ${f[m.k]?"dg":"dz"}" title="${m.l}"></span>`).join("");
+}
+function supDot(sku){
+  const d=supFor(sku);if(!d.length)return`<span class="dot dz"></span>`;
+  return`<span class="dot ${d.some(x=>x.q==null||x.q>0)?"dy":"dr"}"></span>`;
+}
+function skuHasDiff(sku,allSkuPrices){
+  if(!allSkuPrices||!allSkuPrices.length)return false;
+  const globalMin=Math.min(...allSkuPrices);
+  if(globalMin<=0)return false;
+  const globalMax=Math.max(...allSkuPrices);
+  if((globalMax-globalMin)/globalMin*100<=1)return false;
+  // This SKU has diff if any of its MP prices deviate >1% from global min
+  return mpFor(sku).some(m=>m.p!=null&&(m.p-globalMin)/globalMin*100>1);
+}
+
+let openP=null;
+function toggleMP(id){
+  const panel=document.getElementById("mpp-"+id),btn=document.getElementById("mpb-"+id);
+  if(!panel)return;
+  const was=panel.classList.contains("open");
+  if(openP&&openP!==id){
+    const pp=document.getElementById("mpp-"+openP),pb=document.getElementById("mpb-"+openP);
+    if(pp)pp.classList.remove("open");
+    if(pb){pb.classList.remove("on");pb.textContent="Ver preços";}
+  }
+  panel.classList.toggle("open",!was);
+  btn.classList.toggle("on",!was);
+  btn.textContent=was?"Ver preços":"Fechar";
+  openP=was?null:id;
+}
+
+function renderPanel(sku,id,allSkuPrices){
+  const byMp={};for(const m of mpFor(sku))byMp[m.mp]=m;
+
+  // allSkuPrices = flat array of ALL prices across ALL skus of this product
+  const globalMin=allSkuPrices.length?Math.min(...allSkuPrices):null;
+  const globalMax=allSkuPrices.length?Math.max(...allSkuPrices):null;
+  const globalDiff=(globalMin&&globalMax&&globalMin>0)?((globalMax-globalMin)/globalMin*100):0;
+  const anyDiff=globalDiff>1;
+
+  const found=MPC.map(m=>byMp[m.k]?.p).filter(p=>p!=null);
+  const skuMin=found.length?Math.min(...found):null;
+  const skuMax=found.length?Math.max(...found):null;
+  const skuDiff=(skuMin&&skuMax&&skuMin>0)?((skuMax-skuMin)/skuMin*100):0;
+
+  const tiles=MPC.map(m=>{
+    const item=byMp[m.k];
+    if(!item)return`<div class="mp-tile"><div class="mp-label" style="color:#a8a29e">${m.l}</div><div class="mp-na">Não listado</div></div>`;
+    const price=item.p;
+    // Flag: this price is more than 1% above the global minimum across ALL skus+MPs
+    const isDiff=anyDiff&&globalMin!=null&&price!=null&&globalMin>0&&(price-globalMin)/globalMin*100>1;
+    // Cheapest: this is the global minimum
+    const isCheapest=anyDiff&&price!=null&&globalMin!=null&&Math.abs(price-globalMin)<0.01;
+    let cls="mp-tile found",badge="";
+    if(isDiff){const pct=(price-globalMin)/globalMin*100;cls+=" diff";badge=`<span class="diff-badge">+${pct.toFixed(1)}%</span>`;}
+    else if(isCheapest&&found.length>0&&globalDiff>1){cls+=" cheapest";badge=`<span class="cheapest-badge">MENOR</span>`;}
+    let extra="";
+    if(m.k==="Shopify"&&item.cp!=null)extra=`<div class="mp-extra">Compare: $${item.cp.toFixed(2)}</div>`;
+    if(m.k==="Walmart"){if(item.bb!=null&&item.bb!==price)extra=`<div class="mp-extra">Buy Box: $${item.bb.toFixed(2)}</div>`;if(item.st)extra+=`<div class="mp-extra">${item.st}</div>`;}
+    return`<div class="${cls}" style="border-left-color:${m.c}">${badge}<div class="mp-label" style="color:${m.c}">${m.l}</div><div class="mp-price">${price!=null?"$"+price.toFixed(2):"N/A"}</div>${item.q!=null?`<div class="mp-qty">Qtd: ${item.q}</div>`:""}${extra}</div>`;
+  }).join("");
+
+  let summary="";
+  if(found.length){
+    const dl=skuDiff>1?`<span class="ps-diff warn">Variação neste SKU: ${skuDiff.toFixed(1)}%</span>`:`<span class="ps-diff ok">Iguais</span>`;
+    summary=`<div class="price-summary">${skuMin!=null?`<span class="ps-item">Mín: <b>$${skuMin.toFixed(2)}</b></span>`:""} ${skuMax!=null&&skuMax!==skuMin?`<span class="ps-item">Máx: <b>$${skuMax.toFixed(2)}</b></span>`:""} ${dl}</div>`;
+  }
+  return`<div class="mp-panel" id="mpp-${id}"><div class="mp-sku-lbl">SKU: ${sku}</div><div class="mp-grid">${tiles}</div>${summary}</div>`;
+}
+
+function renderSup(equivs,principal){
+  const allSkus=[principal,...equivs.map(([s])=>s)];
+  const entries=[];allSkus.forEach(sku=>supFor(sku).forEach(d=>entries.push({sku,...d})));
+  document.getElementById("sup-cnt").textContent=entries.length;
+  if(!entries.length)return`<div class="no-sup">Nenhum dado encontrado.</div>`;
+  return entries.map(e=>{
+    const whHtml=e.w?Object.entries(e.w).map(([k,v])=>{
+      const n=typeof v==="number",has=n?v>0:!["0","OUT OF STOCK",""].includes(String(v).trim().toUpperCase()),low=n&&v>0&&v<5;
+      return`<span class="wh-pill${has?(low?" low":" stk"):""}">${k}: ${v}</span>`;
+    }).join(""):"";
+    const locHtml=e.loc?`<span class="wh-pill">${e.loc}</span>`:"";
+    return`<div class="sup-row"><div class="sup-name-row"><span class="sup-name">${e.s}</span><span class="sup-sku">${e.sku}</span></div><div class="sup-details">${e.p!=null?`<span class="sup-stat">Preço: <b>$${e.p.toFixed(2)}</b></span>`:""} ${e.q!=null?`<span class="sup-stat">Qtd: <b>${e.q}</b></span>`:""}</div>${whHtml||locHtml?`<div class="wh-pills">${whHtml}${locHtml}</div>`:""}</div>`;
+  }).join("");
+}
+
+function renderPricing(cod,principalSku,isPaused){
+  const px=PX[cod]||PX[principalSku];
+  if(!px)return`<div class="pricing-module" style="display:none"></div>`;
+
+  // Status config
+  const statusMap={
+    "OK":{cls:"status-ok",icon:"✓",label:"OK — Precificado"},
+    "Estoque Insuficiente":{cls:"status-insuf",icon:"⚠",label:"Estoque Insuficiente"},
+    "Sem Preço na Tabela":{cls:"status-sem",icon:"—",label:"Sem Preço na Tabela"}
+  };
+  const st=statusMap[px.status]||{cls:"status-sem",icon:"?",label:px.status};
+
+  // Meta row
+  const metaHtml=`<div class="pricing-meta">
+    <div><div class="pm-label">Status</div><span class="status-pill ${st.cls}">${st.icon} ${st.label}</span></div>
+    ${px.sup?`<div><div class="pm-label">Fornecedor selecionado</div><div class="pm-item"><b>${px.sup}</b></div></div>`:""}
+    ${px.cost!=null?`<div><div class="pm-label">Custo do fornecedor</div><div class="pm-item"><b>$${px.cost.toFixed(2)}</b></div></div>`:""}
+    ${px.ship!=null?`<div><div class="pm-label">Shipping Cost</div><div class="pm-item"><b>$${parseFloat(px.ship).toFixed(2)}</b></div></div>`:""}
+    ${px.cost!=null&&px.ship!=null?`<div><div class="pm-label">Custo Total</div><div class="pm-item"><b>$${(px.cost+parseFloat(px.ship)).toFixed(2)}</b></div></div>`:""}
+    <div><div class="pm-label">Categoria</div><div class="pm-item">${px.cat||"—"}</div></div>
+  </div>`;
+
+  // Price tiles - 6 marketplaces
+  const mkpNames=["Stock AC","QUALY AIR","Qualy Air Shopify","Walmart US","Qualy Air - Amazon US","Ebay-Forceparts"];
+  const mkpColors={"Stock AC":"#2563eb","QUALY AIR":"#059669","Qualy Air Shopify":"#96bf48","Walmart US":"#0071ce","Qualy Air - Amazon US":"#d97706","Ebay-Forceparts":"#dc2626"};
+
+  const tilesHtml=mkpNames.map(mkp=>{
+    const calcPrice=px.prices[mkp];
+    const mpKey=MKP_MAP[mkp];
+    const mpData=mpFor(principalSku);
+    const mpItem=mpData.find(m=>m.mp===mpKey);
+    const currentPrice=mpItem?.p;
+    const color=mkpColors[mkp]||"#78716c";
+    const noStock = !px.has_stock && px.cost!=null;
+
+    let vsHtml="";
+    if(calcPrice!=null&&currentPrice!=null){
+      const diff=currentPrice-calcPrice;
+      const pct=Math.abs(diff/calcPrice*100);
+      if(Math.abs(diff)<0.02){vsHtml=`<div class="pct-vs"><span class="vs-label">Atual MP:</span><span class="vs-price vs-equal">$${currentPrice.toFixed(2)} ✓</span></div>`;}
+      else if(diff>0){vsHtml=`<div class="pct-vs"><span class="vs-label">Atual MP:</span><span class="vs-price vs-above">$${currentPrice.toFixed(2)} +${pct.toFixed(1)}%</span></div>`;}
+      else{vsHtml=`<div class="pct-vs"><span class="vs-label">Atual MP:</span><span class="vs-price vs-below">$${currentPrice.toFixed(2)} ${pct.toFixed(1)}% abaixo</span></div>`;}
+    }else if(calcPrice!=null&&currentPrice==null){
+      vsHtml=`<div class="pct-vs"><span class="vs-label">Atual MP:</span><span class="vs-price vs-none">Não listado</span></div>`;
+    }
+
+    const noStockBadge = noStock ? `<div style="font-size:9px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:3px;padding:1px 5px;display:inline-block;margin-bottom:4px;">⚠ Sem estoque — referência</div>` : "";
+
+    return`<div class="price-calc-tile">
+      <div class="pct-mp-name" style="color:${color}">${mkp}</div>
+      ${noStockBadge}
+      ${calcPrice!=null
+        ?`<div class="pct-price" style="${noStock?"opacity:0.7":""}"">$${calcPrice.toFixed(2)}</div><div class="pct-detail">${px.cost!=null&&px.ship!=null?"Custo+frete: $"+(px.cost+parseFloat(px.ship)).toFixed(2):""}</div>${vsHtml}`
+        :`<div class="pct-price no-price">Sem regra</div>`}
+    </div>`;
+  }).join("");
+
+  return`<div class="pricing-module">
+    <div class="pricing-head" onclick="togglePricing()" style="cursor:pointer;user-select:none;">
+      <h3>Precificação calculada</h3>
+      <span class="status-pill ${st.cls}">${st.icon} ${st.label}</span>
+      ${isPaused?`<span style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:4px;">⏸ INATIVADO — preço manual</span>`:""}
+      <span id="pricing-arrow" style="margin-left:8px;font-size:13px;color:#a8a29e;transition:transform .2s;display:inline-block;">&#9650;</span>
+    </div>
+    <div id="pricing-body">
+      ${isPaused?`<div style="background:#fef2f2;border-bottom:1px solid #fecaca;padding:10px 18px;font-size:12px;color:#991b1b;display:flex;align-items:center;gap:8px;"><span style="font-size:16px">⏸</span> Este produto está <b>inativado</b> — o preço está sendo gerenciado manualmente. Os valores calculados abaixo são apenas referência.</div>`:""}
+      ${metaHtml}
+      <div class="pricing-grid">${tilesHtml}</div>
+    </div>
+  </div>`;
+}
+
+function showProduct(cod){
+  const prod=PI[cod];if(!prod)return;
+  const eq=prod.eq.filter(([s])=>s&&s!=="nan");
+  const psku=prod.sku;
+  const allSkus=[psku,...eq.map(([s])=>s)];
+  document.getElementById("bc-sku").textContent=psku+" ("+cod+")";
+
+  // Collect ALL prices across ALL skus of this product (principal + equivalents)
+  const allSkuPrices=[];
+  allSkus.forEach(s=>mpFor(s).forEach(m=>{if(m.p!=null)allSkuPrices.push(m.p);}));
+  const mn=allSkuPrices.length?Math.min(...allSkuPrices):null;
+  const mx=allSkuPrices.length?Math.max(...allSkuPrices):null;
+  const gdiff=mn&&mx&&mn>0?((mx-mn)/mn*100):0;
+
+  // Count flagged tiles (prices more than 1% above global min)
+  let dc=0;
+  allSkus.forEach(s=>mpFor(s).forEach(m=>{if(m.p!=null&&mn!=null&&mn>0&&(m.p-mn)/mn*100>1)dc++;}));
+
+  const isPaused = PI[cod]?.paused || false;
+
+  document.getElementById("hero").innerHTML=`
+    <div class="prod-name">${prod.name}${isPaused ? ' <span style="display:inline-flex;align-items:center;gap:4px;background:#fef2f2;color:#991b1b;border:1px solid #fecaca;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700;vertical-align:middle">⏸ INATIVADO</span>' : ''}</div>
+    <div class="tags">
+      <span class="tag t-dark">Cód: ${cod}</span>
+      <span class="tag t-blue">SKU: ${psku}</span>
+      <span class="tag t-gray">${prod.cat}</span>
+      <span class="tag t-gray">${eq.length} equiv.</span>
+      ${gdiff>1?`<span class="tag t-warn">⚠ ${dc} divergente${dc!==1?"s":""} · ${gdiff.toFixed(1)}%</span>`:""}
+      ${allSkuPrices.length&&gdiff<=1?`<span class="tag t-ok">✓ Preços alinhados</span>`:""}
+      ${isPaused?`<span class="tag t-red">⏸ Inativado — preço manual</span>`:""}
+    </div>`;
+
+  let rows="",panels="";
+  const mkRow=(sku,badge,sup,rid)=>{
+    const hasDiff=skuHasDiff(sku,allSkuPrices);
+    const diffPill=hasDiff?`<span class="row-diff-pill">▲ divergente</span>`:"";
+    rows+=`<tr><td><span class="${sku===psku?"mono-b":"mono-p"}">${sku}</span></td><td>${badge}${sup?`<span class="sup-tag">${sup}</span>`:""}${diffPill}</td><td><div class="dots">${mpDots(sku)}</div></td><td><div class="dots">${supDot(sku)}</div></td><td style="text-align:right"><button class="tog-btn" id="mpb-${rid}" onclick="toggleMP('${rid}')">Ver preços</button></td></tr>`;
+    panels+=renderPanel(sku,rid,allSkuPrices);
+  };
+  mkRow(psku,`<span class="badge b-blue">Principal</span>`,"","r0");
+  eq.forEach(([sku,sup],i)=>mkRow(sku,`<span class="badge b-purp">Equiv.</span>`,sup,`r${i+1}`));
+
+  document.getElementById("sku-rows").innerHTML=rows;
+  document.getElementById("mp-panels").innerHTML=panels;
+  document.getElementById("sup-body").innerHTML=renderSup(eq,psku);
+  document.getElementById("pricing-wrapper").innerHTML=renderPricing(cod,psku,isPaused);
+
+  openP=null;
+  document.getElementById("search-page").style.display="none";
+  document.getElementById("prod-page").style.display="block";
+  window.scrollTo(0,0);
+}
+
+function doSearch(){
+  const q=document.getElementById("q").value.trim();if(!q)return;
+  const cod=PI[q]?q:S2C[q.toUpperCase()];
+  if(!cod){alert('SKU "'+q+'" não encontrado.');return;}
+  showProduct(cod);
+}
+function doMini(){
+  const q=document.getElementById("mini-q").value.trim();if(!q)return;
+  const cod=PI[q]?q:S2C[q.toUpperCase()];
+  if(!cod){alert('SKU "'+q+'" não encontrado.');return;}
+  document.getElementById("mini-q").value="";showProduct(cod);
+}
+function togglePricing(){
+  const body=document.getElementById("pricing-body");
+  const arrow=document.getElementById("pricing-arrow");
+  if(!body)return;
+  const hidden=body.style.display==="none";
+  body.style.display=hidden?"block":"none";
+  arrow.style.transform=hidden?"":"rotate(180deg)";
+}
+function goBack(){document.getElementById("prod-page").style.display="none";document.getElementById("search-page").style.display="block";openP=null;}
+function ex(el){document.getElementById("q").value=el.textContent;doSearch();}
+
+// ── CRUZAMENTO JS ──
+let suppliers=[];
+let crossResults=null;
+let activeTab='matches';
+const COLORS=['#185FA5','#0F6E56','#993C1D','#993356','#3B6D11','#7B4F00','#534AB7','#8B0000','#006666'];
+
+function handleDragOver(e){e.preventDefault();document.getElementById('drop-zone').classList.add('over')}
+function handleDragLeave(){document.getElementById('drop-zone').classList.remove('over')}
+function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('over');handleFiles(e.dataTransfer.files)}
+
+function handleFiles(files){
+  Array.from(files).forEach(f=>{
+    const ext=f.name.split('.').pop().toLowerCase();
+    if(!['xlsx','xls','csv'].includes(ext)){alert('Formato não suportado: '+f.name);return}
+    const reader=new FileReader();
+    reader.onload=e=>{
+      let headers,rows;
+      if(ext==='csv'){
+        const lines=e.target.result.split('\n').filter(l=>l.trim());
+        headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
+        rows=lines.slice(1).map(l=>{
+          const cols=l.split(',').map(c=>c.replace(/"/g,'').trim());
+          const obj={};headers.forEach((h,i)=>obj[h]=cols[i]||'');return obj;
+        });
+      }else{
+        const wb2=XLSX.read(e.target.result,{type:'array'});
+        const ws2=wb2.Sheets[wb2.SheetNames[0]];
+        const raw=XLSX.utils.sheet_to_json(ws2,{header:1,defval:''});
+        let hRow=0;
+        for(let i=0;i<Math.min(15,raw.length);i++){
+          const vals=raw[i].map(v=>String(v).toLowerCase().trim());
+          if(vals.some(v=>['customlabel','sku','part number','part_number','item number','item_id','sku interno'].includes(v))){hRow=i;break}
+        }
+        headers=raw[hRow].map(h=>String(h).trim()).filter(h=>h);
+        rows=raw.slice(hRow+1).map(r=>{
+          const obj={};headers.forEach((h,i)=>obj[h]=String(r[i]||'').trim());return obj;
+        }).filter(r=>Object.values(r).some(v=>v));
+      }
+      const sId=Date.now()+'_'+Math.random().toString(36).slice(2,6);
+      const guessed=guessColumns(headers);
+      suppliers.push({id:sId,name:f.name.replace(/\.[^.]+$/,''),file:f.name,headers,rows,mapping:guessed,color:COLORS[suppliers.length%COLORS.length]});
+      renderSuppliers();
+    };
+    if(ext==='csv')reader.readAsText(f);else reader.readAsArrayBuffer(f);
+  });
+}
+
+function guessColumns(headers){
+  const find=terms=>headers.find(h=>terms.some(t=>h.toLowerCase().includes(t)))||'';
+  return{
+    sku:find(['customlabel','sku','item number','item_id','our part','sku interno']),
+    oem:find(['oem cross','oem_cross','c:oem','manufacturer part','c:manufacturer','part number','part_number','interchange','oem']),
+    title:find(['title','headline','name','description','descri']),
+    price:find(['startprice','price_raw','price_value','price','cost','preco','preço','msrp']),
+    makes:find(['fit makes','fit_makes','brand','marca','fabricante']),
+    models:find(['fit models','fit_models','model','application','modelo']),
+  };
+}
+
+function fieldLabel(f){return{sku:'SKU interno',oem:'Número OEM ★ (chave)',title:'Título / Descrição',price:'Preço',makes:'Marcas (fitment)',models:'Modelos (fitment)'}[f]||f}
+
+function renderSuppliers(){
+  const list=document.getElementById('suppliers-list');
+  if(suppliers.length===0){list.innerHTML='';document.getElementById('run-row').style.display='none';return}
+  list.innerHTML=suppliers.map((s,idx)=>`
+    <div class="supplier-card">
+      <div class="supplier-header">
+        <div class="supplier-icon" style="background:${s.color}">${s.name.charAt(0).toUpperCase()}</div>
+        <div>
+          <div class="supplier-name">${s.name}</div>
+          <div class="supplier-meta">${s.rows.length.toLocaleString()} linhas · ${s.headers.length} colunas</div>
+        </div>
+        <button class="btn-danger" style="margin-left:auto" onclick="removeSupplier('${s.id}')">✕ Remover</button>
+      </div>
+      <div class="col-map">
+        ${['sku','oem','title','price','makes','models'].map(field=>`
+          <div>
+            <label>${fieldLabel(field)}</label>
+            <select onchange="updateMapping('${s.id}','${field}',this.value)">
+              <option value="">(não mapear)</option>
+              ${s.headers.map(h=>`<option value="${h}"${s.mapping[field]===h?' selected':''}>${h}</option>`).join('')}
+            </select>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('run-row').style.display='flex';
+}
+
+function updateMapping(sid,field,val){const s=suppliers.find(x=>x.id===sid);if(s)s.mapping[field]=val}
+function removeSupplier(sid){suppliers=suppliers.filter(s=>s.id!==sid);renderSuppliers();document.getElementById('results-section').style.display='none'}
+function clearAll(){suppliers=[];crossResults=null;renderSuppliers();document.getElementById('results-section').style.display='none'}
+
+function normalizeOEM(s){return String(s||'').toUpperCase().replace(/[\s\-_\/\.]/g,'').trim()}
+function extractOEMs(val){
+  if(!val)return[];
+  return String(val).split(/[|,\/]/).map(v=>v.trim()).filter(v=>v.length>2).map(normalizeOEM).filter(v=>v);
+}
+
+function runCrossRef(){
+  if(suppliers.length<1){alert('Adicione pelo menos 1 fornecedor.');return}
+  document.getElementById('status-msg').textContent='Processando...';
+  const oemIndex={};
+  suppliers.forEach(s=>{
+    s.rows.forEach(row=>{
+      const sku=row[s.mapping.sku]||'';
+      const oemRaw=row[s.mapping.oem]||'';
+      const title=row[s.mapping.title]||'';
+      const price=row[s.mapping.price]||'';
+      const makes=row[s.mapping.makes]||'';
+      const models=row[s.mapping.models]||'';
+      let oems=extractOEMs(oemRaw);
+      if(oems.length===0&&sku)oems=[normalizeOEM(sku)];
+      oems.forEach(oem=>{
+        if(!oem)return;
+        if(!oemIndex[oem])oemIndex[oem]={oem,entries:[]};
+        oemIndex[oem].entries.push({supplier:s.name,color:s.color,sku,title,price,makes,models,oemRaw});
+      });
+    });
+  });
+  Object.values(oemIndex).forEach(item=>{const seen=new Set();item.entries=item.entries.filter(e=>{const key=e.supplier+"__"+e.sku;if(seen.has(key))return false;seen.add(key);return true;});});
+  const allOEM=Object.values(oemIndex);
+  const matches=allOEM.filter(x=>new Set(x.entries.map(e=>e.supplier)).size>1);
+  const catalog=allOEM.map(x=>{
+    const sups=[...new Set(x.entries.map(e=>e.supplier))];
+    const best=x.entries.find(e=>e.title)||x.entries[0];
+    const prices=x.entries.map(e=>parseFloat(String(e.price).replace(/[^0-9.]/g,''))).filter(p=>!isNaN(p)&&p>0);
+    return{oem:x.oem,title:best.title,suppliers:sups,entries:x.entries,prices,makes:best.makes,models:best.models};
+  }).sort((a,b)=>b.suppliers.length-a.suppliers.length||a.oem.localeCompare(b.oem));
+  const gaps={};
+  suppliers.forEach(s=>{
+    const thisOEMs=new Set();
+    s.rows.forEach(row=>{
+      const oemRaw=row[s.mapping.oem]||'';
+      const sku=row[s.mapping.sku]||'';
+      extractOEMs(oemRaw||sku).forEach(o=>thisOEMs.add(o));
+    });
+    gaps[s.name]={has:thisOEMs,missing:[],color:s.color};
+  });
+  allOEM.forEach(item=>{
+    const hasSups=new Set(item.entries.map(e=>e.supplier));
+    suppliers.forEach(s=>{if(!hasSups.has(s.name))gaps[s.name].missing.push(item)});
+  });
+  crossResults={matches,catalog,gaps,oemIndex,totalOEM:allOEM.length};
+  document.getElementById('status-msg').textContent='';
+  renderResults();
+}
+
+function renderResults(){
+  const r=crossResults;
+  document.getElementById('results-section').style.display='block';
+  document.getElementById('stats-grid').innerHTML=`
+    <div class="stat"><div class="stat-num">${r.totalOEM.toLocaleString()}</div><div class="stat-lbl">OEMs únicos</div></div>
+    <div class="stat"><div class="stat-num" style="color:#2e7d32">${r.matches.length.toLocaleString()}</div><div class="stat-lbl">Peças em comum</div></div>
+    <div class="stat"><div class="stat-num">${r.catalog.length.toLocaleString()}</div><div class="stat-lbl">Catálogo total</div></div>
+    <div class="stat"><div class="stat-num" style="color:#1565c0">${suppliers.length}</div><div class="stat-lbl">Fornecedores</div></div>
+  `;
+  switchTab(activeTab);
+  document.getElementById('results-section').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function switchTab(tab){
+  activeTab=tab;
+  ['matches','catalog','gaps'].forEach(t=>{document.getElementById('tab-'+t).classList.toggle('active',t===tab)});
+  const c=document.getElementById('tab-content');
+  if(tab==='matches')renderMatches(c);
+  else if(tab==='catalog')renderCatalog(c);
+  else renderGaps(c);
+}
+
+let matchFilter='',matchSupFilter='';
+function renderMatches(c){
+  const r=crossResults;
+  const filtered=r.matches.filter(x=>{
+    const q=matchFilter.toLowerCase();
+    const supOk=!matchSupFilter||x.entries.some(e=>e.supplier===matchSupFilter);
+    return(!q||(x.oem.toLowerCase().includes(q)||(x.entries[0]?.title||'').toLowerCase().includes(q)))&&supOk;
+  });
+  c.innerHTML=`
+    <div class="search-bar">
+      <input type="text" placeholder="Buscar por OEM ou título..." value="${matchFilter}" oninput="matchFilter=this.value;renderMatches(document.getElementById('tab-content'))">
+      <select onchange="matchSupFilter=this.value;renderMatches(document.getElementById('tab-content'))">
+        <option value="">Todos os fornecedores</option>
+        ${suppliers.map(s=>`<option value="${s.name}"${matchSupFilter===s.name?' selected':''}>${s.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="alert alert-info">✅ ${filtered.length.toLocaleString()} OEMs encontrados em 2 ou mais fornecedores</div>
+    ${filtered.length===0?'<div class="empty-state">🔍 Nenhum resultado encontrado</div>':
+    `<div class="tbl-wrap"><table>
+      <thead><tr>
+        <th style="width:14%">OEM normalizado</th>
+        <th style="width:26%">Título / Aplicação</th>
+        <th style="width:28%">Fornecedor — SKU</th>
+        <th style="width:14%">Faixa de preço</th>
+        <th style="width:12%">OEM original</th>
+        <th style="width:6%">Status</th>
+      </tr></thead>
+      <tbody>${filtered.slice(0,500).map(x=>{
+        const prices=x.entries.map(e=>parseFloat(String(e.price).replace(/[^0-9.]/g,''))).filter(p=>!isNaN(p)&&p>0);
+        const minP=prices.length?Math.min(...prices):null;
+        const maxP=prices.length?Math.max(...prices):null;
+        const title=x.entries.find(e=>e.title)?.title||'—';
+        const makes=x.entries.find(e=>e.makes)?.makes||'';
+        const oemOrig=x.entries[0]?.oemRaw||'';
+        const supSkus=x.entries.map(e=>{const sup=suppliers.find(ss=>ss.name===e.supplier);return`<div style="margin-bottom:3px"><span class="badge" style="background:${sup?.color||'#888'}22;color:${sup?.color||'#888'}">${e.supplier}</span> <span class="mono" style="font-size:11px;color:#444">${e.sku||'—'}</span></div>`;}).join('');
+        return`<tr>
+          <td class="mono">${x.oem}</td>
+          <td><div style="font-size:12px">${title.slice(0,80)}</div>${makes?`<span class="tag">${makes.slice(0,35)}</span>`:''}</td>
+          <td>${supSkus}</td>
+          <td style="font-size:12px">${minP?`$${minP===maxP?minP.toFixed(2):`${minP.toFixed(2)} – $${maxP.toFixed(2)}`}`:'—'}</td>
+          <td style="font-size:11px;color:#888">${oemOrig.slice(0,25)}</td>
+          <td><span class="badge badge-match">Match</span></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`}
+  `;
+}
+
+let catFilter='';
+function renderCatalog(c){
+  const r=crossResults;
+  const filtered=r.catalog.filter(x=>{
+    const q=catFilter.toLowerCase();
+    return!q||(x.oem.toLowerCase().includes(q)||(x.title||'').toLowerCase().includes(q)||(x.makes||'').toLowerCase().includes(q));
+  });
+  c.innerHTML=`
+    <div class="search-bar">
+      <input type="text" placeholder="Buscar OEM, título, marca..." value="${catFilter}" oninput="catFilter=this.value;renderCatalog(document.getElementById('tab-content'))">
+    </div>
+    <div class="alert alert-info">📦 ${filtered.length.toLocaleString()} peças no catálogo unificado</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th style="width:14%">OEM</th>
+        <th style="width:28%">Título</th>
+        <th style="width:14%">Marcas</th>
+        <th style="width:28%">Fornecedor — SKU</th>
+        <th style="width:10%">Menor preço</th>
+        <th style="width:6%">Qtd</th>
+      </tr></thead>
+      <tbody>${filtered.slice(0,500).map(x=>{
+        const minP=x.prices.length?Math.min(...x.prices):null;
+        const supSkus=x.entries.map(e=>{const sup=suppliers.find(ss=>ss.name===e.supplier);return`<div style="margin-bottom:2px"><span class="badge" style="background:${sup?.color||'#888'}22;color:${sup?.color||'#888'}">${e.supplier}</span> <span class="mono" style="font-size:11px;color:#444">${e.sku||'—'}</span></div>`;}).join('');
+        return`<tr>
+          <td class="mono">${x.oem}</td>
+          <td style="font-size:12px">${(x.title||'—').slice(0,70)}</td>
+          <td style="font-size:11px;color:#666">${(x.makes||'—').slice(0,30)}</td>
+          <td>${supSkus}</td>
+          <td style="font-size:12px">${minP?'$'+minP.toFixed(2):'—'}</td>
+          <td style="font-size:12px;text-align:center;font-weight:600">${x.suppliers.length>1?`<span style="color:#2e7d32">${x.suppliers.length}</span>`:x.suppliers.length}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>
+  `;
+}
+
+function renderGaps(c){
+  const r=crossResults;
+  c.innerHTML=`
+    <div class="alert alert-info">⚠️ Peças que cada fornecedor <strong>não possui</strong> mas os outros têm</div>
+    <div class="gap-grid">
+      ${Object.entries(r.gaps).map(([sname,gdata])=>`
+        <div class="supplier-card">
+          <div class="supplier-header">
+            <div class="supplier-icon" style="background:${gdata.color}">${sname.charAt(0).toUpperCase()}</div>
+            <div>
+              <div class="supplier-name">${sname}</div>
+              <div class="supplier-meta" style="color:${gdata.missing.length>0?'#e65100':'#2e7d32'};font-weight:600">${gdata.missing.length.toLocaleString()} peças ausentes</div>
+            </div>
+          </div>
+          ${gdata.missing.length===0?'<p style="font-size:12px;color:#2e7d32">✅ Cobre todos os OEMs dos outros fornecedores</p>':
+          `<div style="max-height:220px;overflow-y:auto">${gdata.missing.slice(0,60).map(item=>{
+            const e=item.entries[0];
+            return`<div class="gap-item">
+              <span class="mono">${item.oem}</span>
+              <span class="badge" style="background:${e.color||'#888'}22;color:${e.color||'#888'};margin-left:6px">${e.supplier}</span>
+              <span class="mono" style="font-size:11px;color:#666;margin-left:4px">${e.sku||''}</span>
+              <span style="color:#bbb;margin-left:6px;font-size:11px">${(e.title||'').slice(0,35)}</span>
+            </div>`;
+          }).join('')}${gdata.missing.length>60?`<p style="font-size:11px;color:#999;padding-top:6px">...e mais ${gdata.missing.length-60} peças</p>`:''}</div>`}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function exportResults(){
+  if(!crossResults)return;
+  const r=crossResults;
+  const wb2=XLSX.utils.book_new();
+
+  const supNames=suppliers.map(s=>s.name);
+  const catHeader=['OEM','Título','Marcas','Em múltiplos fornecedores','Menor preço','Maior preço'];
+  supNames.forEach(sn=>{catHeader.push(sn+' — SKU');catHeader.push(sn+' — Preço');});
+  const catRows=[catHeader];
+  r.catalog.forEach(x=>{
+    const minP=x.prices.length?Math.min(...x.prices):'';
+    const maxP=x.prices.length?Math.max(...x.prices):'';
+    const row=[x.oem,x.title||'',x.makes||'',x.suppliers.length>1?'SIM':'NÃO',minP,maxP];
+    supNames.forEach(sn=>{
+      const entry=x.entries.find(e=>e.supplier===sn);
+      row.push(entry?entry.sku||'':'');
+      row.push(entry?entry.price||'':'');
+    });
+    catRows.push(row);
+  });
+  XLSX.utils.book_append_sheet(wb2,XLSX.utils.aoa_to_sheet(catRows),'Catálogo Unificado');
+
+  const mHeader=['OEM','Título','OEM original','Menor preço','Maior preço','Diferença'];
+  supNames.forEach(sn=>{mHeader.push(sn+' — SKU');mHeader.push(sn+' — Preço');});
+  const mRows=[mHeader];
+  r.matches.forEach(x=>{
+    const prices=x.entries.map(e=>parseFloat(String(e.price).replace(/[^0-9.]/g,''))).filter(p=>!isNaN(p)&&p>0);
+    const minP=prices.length?Math.min(...prices):'';
+    const maxP=prices.length?Math.max(...prices):'';
+    const diff=minP!==''&&maxP!==''?maxP-minP:'';
+    const row=[x.oem,x.entries[0]?.title||'',x.entries[0]?.oemRaw||'',minP,maxP,diff];
+    supNames.forEach(sn=>{
+      const entry=x.entries.find(e=>e.supplier===sn);
+      row.push(entry?entry.sku||'':'');
+      row.push(entry?entry.price||'':'');
+    });
+    mRows.push(row);
+  });
+  XLSX.utils.book_append_sheet(wb2,XLSX.utils.aoa_to_sheet(mRows),'Peças em Comum');
+
+  Object.entries(r.gaps).forEach(([sname,gdata])=>{
+    if(gdata.missing.length===0)return;
+    const gRows=[['OEM','Título','Fornecedor que tem','SKU do fornecedor','Preço']];
+    gdata.missing.forEach(item=>{
+      const e=item.entries[0];
+      gRows.push([item.oem,e.title||'',e.supplier,e.sku||'',e.price||'']);
+    });
+    XLSX.utils.book_append_sheet(wb2,XLSX.utils.aoa_to_sheet(gRows),('Gap_'+sname).slice(0,31));
+  });
+
+  XLSX.writeFile(wb2,'cruzamento_pecas_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+
+// ── INIT ──
+initProdutos();
+</script>
+</body>
+</html>

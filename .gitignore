@@ -1,0 +1,20 @@
+# Banco de dados (gerado automaticamente)
+data/db/
+
+# Dados exportados (gerados automaticamente)
+frontend/data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+env/
+
+# VSCode
+.vscode/settings.json
+
+# Sistema
+.DS_Store
+Thumbs.db
