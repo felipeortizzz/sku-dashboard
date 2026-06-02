@@ -603,6 +603,34 @@ tr:hover td{background:#fafaf9;}
 .login-err-msg{font-size:12px;color:#ef4444;text-align:center;margin-top:10px;display:none;}
 .login-footer{font-size:11px;color:#a8a29e;text-align:center;margin-top:20px;}
 
+
+/* ── CRITICAL STOCK ── */
+.crit-table{width:100%;border-collapse:collapse;}
+.crit-table th{text-align:left;padding:8px 14px;font-size:10px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.04em;background:#fafaf9;border-bottom:1px solid #f0efee;}
+.crit-table td{padding:9px 14px;border-bottom:1px solid #f5f5f4;font-size:12px;vertical-align:middle;}
+.crit-table tr:hover td{background:#fafaf9;cursor:pointer;}
+.crit-vel-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+.crit-stock-bar{height:6px;border-radius:3px;background:#f0efee;overflow:hidden;width:80px;display:inline-block;vertical-align:middle;margin-left:6px;}
+.crit-stock-fill{height:100%;border-radius:3px;}
+.days-ok{color:#22c55e;font-weight:700;}
+.days-warn{color:#f59e0b;font-weight:700;}
+.days-crit{color:#ef4444;font-weight:700;}
+
+/* ── GEO MAP ── */
+.geo-wrap{padding:14px 18px;}
+.geo-tabs{display:flex;gap:6px;margin-bottom:14px;}
+.geo-tab{padding:5px 12px;border:1px solid #e7e5e4;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:#57534e;background:#fff;}
+.geo-tab.active{background:#1c1917;color:#fff;border-color:#1c1917;}
+.geo-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;}
+.geo-row{display:flex;align-items:center;gap:10px;}
+.geo-flag{font-size:16px;width:24px;flex-shrink:0;text-align:center;}
+.geo-name{font-size:12px;font-weight:600;color:#1c1917;width:140px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.geo-bar-wrap{flex:1;height:12px;background:#f0efee;border-radius:6px;overflow:hidden;}
+.geo-bar{height:100%;border-radius:6px;background:linear-gradient(90deg,#1c1917,#57534e);}
+.geo-val{font-size:11px;font-weight:700;color:#1c1917;width:80px;text-align:right;flex-shrink:0;}
+.geo-count{font-size:10px;color:#a8a29e;width:50px;text-align:right;flex-shrink:0;}
+.us-map-svg{width:100%;max-height:200px;}
+
 </style>
 </head>
 <body>
@@ -840,6 +868,31 @@ tr:hover td{background:#fafaf9;}
         </div>
         <div class="dash-card-body" id="dash-div-body">
           <div class="dash-loading">Carregando...</div>
+        </div>
+      </div>
+
+      <div class="dash-row" style="margin-top:14px">
+        <!-- ESTOQUE CRÍTICO -->
+        <div class="dash-card">
+          <div class="dash-card-head">
+            <span class="dash-card-icon" style="background:#fef2f2;color:#ef4444">🚨</span>
+            Estoque crítico — Top vendas
+            <span class="dash-card-sub">Baseado em vendas 90 dias</span>
+          </div>
+          <div class="dash-card-body" style="padding:0" id="dash-crit-body">
+            <div class="dash-loading">Carregando...</div>
+          </div>
+        </div>
+        <!-- MAPA GEO -->
+        <div class="dash-card">
+          <div class="dash-card-head">
+            <span class="dash-card-icon" style="background:#eff6ff;color:#2563eb">🌎</span>
+            Destino dos pedidos
+            <span class="dash-card-sub">Por receita</span>
+          </div>
+          <div class="geo-wrap" id="dash-geo-body">
+            <div class="dash-loading">Carregando...</div>
+          </div>
         </div>
       </div>
 
@@ -1118,7 +1171,7 @@ tr:hover td{background:#fafaf9;}
 <script>
 // ── NAVIGATION ──
 let produtosLoaded = false;
-let S2C=null,PI=null,MP=null,SUP=null,PX=null,PAUSED=null,TAXA=null,SALES=null;
+let S2C=null,PI=null,MP=null,SUP=null,PX=null,PAUSED=null,TAXA=null,SALES=null,VEL=null,GEO=null;
 
 function switchModule(name) {
   document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
@@ -1142,6 +1195,18 @@ function switchModule(name) {
 }
 
 // ── PRODUTOS JS ──
+async function decompress(b64){
+  const bin=atob(b64),bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  const ds=new DecompressionStream("gzip");
+  const w=ds.writable.getWriter();w.write(bytes);w.close();
+  const chunks=[],r=ds.readable.getReader();
+  while(true){const{done,value}=await r.read();if(done)break;chunks.push(value);}
+  const tot=chunks.reduce((a,c)=>a+c.length,0);
+  const out=new Uint8Array(tot);let off=0;
+  for(const c of chunks){out.set(c,off);off+=c.length;}
+  return JSON.parse(new TextDecoder().decode(out));
+}
 async function fetchData(url){
   const resp=await fetch(url);
   if(!resp.ok)throw new Error("Falha ao carregar: "+url);
@@ -1164,6 +1229,7 @@ async function initProdutos(){
     PX=await fetchData("data/pricing.json");prg(90);
     try{TAXA=await fetchData("data/taxa.json");}catch(e){TAXA={};}
     try{SALES=await fetchData("data/sales.json");populateVendasFilters();}catch(e){SALES=[];}
+    try{VEL=await decompress(D.vel);GEO=await decompress(D.geo);}catch(e){VEL={};GEO={};}
     PAUSED=new Set(Object.keys(PI).filter(k=>PI[k].paused));prg(100);
     await new Promise(r=>setTimeout(r,150));
     document.getElementById("loading").style.display="none";
@@ -2091,6 +2157,10 @@ function buildDashboard() {
         </div>`
       ).join('') + '</div>' + (divAlerts.length > 60 ? `<div style="font-size:11px;color:#a8a29e;padding:10px 18px">...e mais ${divAlerts.length-60}</div>` : '');
 
+  // Critical stock + geo
+  setTimeout(renderCriticalStock, 100);
+  setTimeout(()=>renderGeo('countries'), 100);
+
   // Categories
   const sortedCats = Object.entries(catCounts).sort((a,b) => b[1]-a[1]);
   const maxCat = sortedCats[0]?.[1] || 1;
@@ -2965,6 +3035,162 @@ if (!checkLogin()) {
   });
 }
 
+
+
+// ── ESTOQUE CRÍTICO ──
+function renderCriticalStock() {
+  const body = document.getElementById('dash-crit-body');
+  if (!body || !VEL || !SUP || !PI) return;
+
+  // Get top SKUs by velocity (last 90 days)
+  const topSKUs = Object.entries(VEL)
+    .sort((a,b) => b[1]-a[1])
+    .slice(0, 200);  // check top 200 sellers
+
+  const critItems = [];
+
+  for (const [sku, vel90] of topSKUs) {
+    // Total stock across all suppliers for this SKU
+    const supEntries = SUP[sku.toUpperCase()] || [];
+    const totalStock = supEntries.reduce((sum, e) => {
+      if (e.q != null) return sum + e.q;
+      // For warehouse-based (PBI etc), sum positive values
+      if (e.w) return sum + Object.values(e.w).reduce((s,v) => {
+        const n = parseInt(v);
+        return s + (isNaN(n)||n<0?0:n);
+      }, 0);
+      return sum;
+    }, 0);
+
+    if (totalStock < 0) continue;
+
+    // Days of stock = totalStock / (vel90/90)
+    const dailyVel = vel90 / 90;
+    const daysLeft = dailyVel > 0 ? Math.floor(totalStock / dailyVel) : 999;
+
+    // Only show critical (under 30 days) or warn (under 15 days)
+    if (daysLeft <= 30) {
+      // Find product name
+      const codEntry = S2C[sku.toUpperCase()];
+      const prod = codEntry ? PI[codEntry] : null;
+      critItems.push({
+        sku, vel90, totalStock, daysLeft,
+        name: prod?.name?.slice(0,45) || '',
+        cod: codEntry || '',
+        dailyVel: dailyVel.toFixed(1)
+      });
+    }
+  }
+
+  critItems.sort((a,b) => a.daysLeft - b.daysLeft);
+
+  if (!critItems.length) {
+    body.innerHTML = '<div class="dash-empty">✓ Nenhum produto crítico nos top vendedores</div>';
+    return;
+  }
+
+  const rows = critItems.slice(0, 25).map(item => {
+    const cls = item.daysLeft <= 7 ? 'days-crit' : item.daysLeft <= 15 ? 'days-warn' : 'days-ok';
+    const barW = Math.min(item.totalStock / Math.max(...critItems.map(i=>i.totalStock)) * 100, 100).toFixed(0);
+    const barColor = item.daysLeft <= 7 ? '#ef4444' : item.daysLeft <= 15 ? '#f59e0b' : '#22c55e';
+    return `<tr onclick="switchModule('produtos');showProduct('${item.cod}')" style="cursor:pointer">
+      <td><span style="font-family:monospace;font-size:11px;font-weight:700;color:#1d4ed8">${item.sku}</span></td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#57534e">${item.name}</td>
+      <td style="text-align:center">
+        <span style="font-weight:700">${item.totalStock}</span>
+        <div class="crit-stock-bar"><div class="crit-stock-fill" style="width:${barW}%;background:${barColor}"></div></div>
+      </td>
+      <td style="text-align:center">
+        <span style="font-size:10px;color:#a8a29e">${item.dailyVel}/dia</span>
+      </td>
+      <td style="text-align:center"><span class="${cls}">${item.daysLeft === 0 ? 'ZERADO' : item.daysLeft+'d'}</span></td>
+    </tr>`;
+  }).join('');
+
+  body.innerHTML = `<table class="crit-table">
+    <thead><tr>
+      <th>SKU</th><th>Produto</th>
+      <th style="text-align:center">Estoque</th>
+      <th style="text-align:center">Velocidade</th>
+      <th style="text-align:center">Dias restantes</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div style="padding:8px 14px;font-size:11px;color:#a8a29e">${critItems.length} produtos críticos nos top vendedores dos últimos 90 dias</div>`;
+}
+
+// ── MAPA GEO ──
+const COUNTRY_FLAGS = {
+  'United States':'🇺🇸','Puerto Rico':'🇵🇷','US Virgin Islands':'🇻🇮',
+  'COLOMBIA':'🇨🇴','Australia':'🇦🇺','Canada':'🇨🇦','Peru':'🇵🇪',
+  'United Arab Emirates':'🇦🇪','South Korea':'🇰🇷','Jamaica':'🇯🇲',
+  'Trinidad and Tobago':'🇹🇹','Dominica':'🇩🇲','JAPÃO':'🇯🇵',
+  'Brasil':'🇧🇷','Mexico':'🇲🇽','Chile':'🇨🇱','Argentina':'🇦🇷',
+};
+
+let geoMode = 'countries';
+
+function renderGeo(mode) {
+  geoMode = mode || geoMode;
+  const body = document.getElementById('dash-geo-body');
+  if (!body || !GEO) return;
+
+  const tabsHtml = `<div class="geo-tabs">
+    <button class="geo-tab ${geoMode==='countries'?'active':''}" onclick="renderGeo('countries')">🌎 Países</button>
+    <button class="geo-tab ${geoMode==='states'?'active':''}" onclick="renderGeo('states')">🇺🇸 Estados EUA</button>
+  </div>`;
+
+  if (geoMode === 'countries') {
+    const data = GEO.countries || {};
+    const maxVal = Math.max(...Object.values(data));
+    const rows = Object.entries(data)
+      .filter(([k]) => k && k !== 'nan')
+      .map(([country, rev]) => {
+        const flag = COUNTRY_FLAGS[country] || '🌐';
+        const pct  = (rev/maxVal*100).toFixed(1);
+        const orders = GEO.orders_by_country?.[country] || '';
+        return `<div class="geo-row">
+          <span class="geo-flag">${flag}</span>
+          <span class="geo-name" title="${country}">${country}</span>
+          <div class="geo-bar-wrap"><div class="geo-bar" style="width:${pct}%"></div></div>
+          <span class="geo-val">$${(rev/1000).toFixed(0)}k</span>
+          <span class="geo-count">${orders} pedidos</span>
+        </div>`;
+      }).join('');
+    body.innerHTML = tabsHtml + `<div class="geo-list">${rows}</div>`;
+
+  } else {
+    const data = GEO.us_states_rev || {};
+    const ordData = GEO.us_states_orders || {};
+    const maxVal = Math.max(...Object.values(data));
+    const rows = Object.entries(data)
+      .sort((a,b) => b[1]-a[1])
+      .slice(0,25)
+      .map(([state, rev]) => {
+        const pct = (rev/maxVal*100).toFixed(1);
+        const orders = ordData[state] || '';
+        return `<div class="geo-row">
+          <span class="geo-flag" style="font-size:12px;font-weight:700;color:#1c1917;width:28px">${state}</span>
+          <span class="geo-name">${STATE_NAMES[state]||state}</span>
+          <div class="geo-bar-wrap"><div class="geo-bar" style="width:${pct}%;background:linear-gradient(90deg,#2563eb,#60a5fa)"></div></div>
+          <span class="geo-val">$${(rev/1000).toFixed(0)}k</span>
+          <span class="geo-count">${orders} pedidos</span>
+        </div>`;
+      }).join('');
+    body.innerHTML = tabsHtml + `<div class="geo-list">${rows}</div>`;
+  }
+}
+
+const STATE_NAMES = {
+  TX:'Texas',FL:'Florida',CA:'California',IL:'Illinois',GA:'Georgia',
+  NY:'New York',NC:'North Carolina',AZ:'Arizona',NJ:'New Jersey',TN:'Tennessee',
+  OH:'Ohio',VA:'Virginia',PA:'Pennsylvania',AL:'Alabama',MO:'Missouri',
+  LA:'Louisiana',SC:'South Carolina',NM:'New Mexico',OK:'Oklahoma',IN:'Indiana',
+  WA:'Washington',CO:'Colorado',MI:'Michigan',MD:'Maryland',MA:'Massachusetts',
+  MN:'Minnesota',WI:'Wisconsin',KY:'Kentucky',NV:'Nevada',AR:'Arkansas',
+  MS:'Mississippi',IA:'Iowa',KS:'Kansas',UT:'Utah',OR:'Oregon',
+  CT:'Connecticut',PR:'Puerto Rico',WV:'West Virginia',HI:'Hawaii',
+};
 
 // ── INIT ──
 initProdutos();
