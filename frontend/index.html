@@ -2235,13 +2235,13 @@ let reprecCurrentMP = 'Amazon';
 let reprecAllItems  = [];   // { sku, name, cat, cod, current, calc, diff, paused }
 let reprecFiltered  = [];
 
-// MP key → pricing key mapping
+// MP tab name → pricing key / mp data key mapping
 const REPREC_MP_MAP = {
-  'Amazon':     'Qualy Air - Amazon US',
-  'eBay Stock': 'Stock AC',
-  'eBay Qualy': 'QUALY AIR',
-  'Walmart':    'Walmart US',
-  'Shopify':    'Qualy Air Shopify',
+  'Amazon':     { pricingKey: 'Qualy Air - Amazon US', mpKey: 'Amazon'        },
+  'eBay Stock': { pricingKey: 'Stock AC',               mpKey: 'Stock'         },
+  'eBay Qualy': { pricingKey: 'QUALY AIR',              mpKey: 'Qualy'         },
+  'Walmart':    { pricingKey: 'Walmart US',              mpKey: 'Walmart'       },
+  'Shopify':    { pricingKey: 'Qualy Air Shopify',       mpKey: 'Shopify'       },
 };
 
 function buildReprec() {
@@ -2263,13 +2263,12 @@ function reprecBuildItems() {
     if (!px || !px.prices) continue;
 
     MPs.forEach(mp => {
-      const pricingKey = REPREC_MP_MAP[mp];
+      const { pricingKey, mpKey } = REPREC_MP_MAP[mp];
       const calc = px.prices[pricingKey];
       if (calc == null) return;
 
-      // Find current MP price
       const mpEntries = MP[sku.toUpperCase()] || [];
-      const mpItem    = mpEntries.find(e => e.mp === mp);
+      const mpItem    = mpEntries.find(e => e.mp === mpKey);
       if (!mpItem || mpItem.p == null) return;
 
       const current = mpItem.p;
