@@ -123,6 +123,7 @@ input[type=text]::placeholder{color:#a8a29e;}
 .chip:hover{border-color:#a8a29e;color:#1c1917;}
 
 .prod-page{display:none;}
+.prod-page .layout{padding-top:16px;}
 .sub-bar{background:#fff;border-bottom:1px solid #e7e5e4;padding:0 20px;display:flex;align-items:center;gap:12px;height:46px;position:sticky;top:52px;z-index:99;}
 .layout{max-width:1140px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr 340px;gap:18px;}
 .back-btn{border:none;background:none;font-size:13px;color:#78716c;cursor:pointer;}
@@ -880,7 +881,7 @@ tr:hover td{background:#fafaf9;}
           <button class="btn-sm" onclick="doMini()">Buscar</button>
         </div>
       </div>
-      <div class="layout" style="padding-top:8px">
+      <div class="layout">
         <div>
           <div class="card">
             <div class="hero" id="hero"></div>
@@ -1757,10 +1758,6 @@ function showProduct(cod){
   document.getElementById("margin-wrapper").innerHTML=renderMarginModule(cod,psku);
 
   openP=null;
-  // Scroll FIRST before showing content
-  document.documentElement.scrollTop=0;
-  document.body.scrollTop=0;
-  window.scrollTo(0,0);
   document.getElementById("search-page").style.display="none";
   document.getElementById("cat-list-page").style.display="none";
   document.getElementById("prod-page").style.display="block";
