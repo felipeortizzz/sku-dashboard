@@ -1,7 +1,6 @@
 # Banco de dados (gerado automaticamente)
 data/db/
 
-
 # Python
 __pycache__/
 *.pyc
