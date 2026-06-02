@@ -3483,7 +3483,7 @@ async function initShipModule(mod) {
   const isRet = mod === 'returns';
   const key   = isRet ? 'RETURNS_DATA' : 'TRACKING_DATA';
   
-  if (window[key]) {
+  if ((isRet ? RETURNS_DATA : TRACKING_DATA)) {
     buildShipDash(mod);
     return;
   }
@@ -3493,7 +3493,7 @@ async function initShipModule(mod) {
   
   try {
     const data = await fetchData('data/' + (isRet ? 'returns' : 'tracking') + '.json');
-    window[key] = data;
+    if(isRet) { RETURNS_DATA = data; } else { TRACKING_DATA = data; }
     buildShipDash(mod);
   } catch(e) {
     document.getElementById(mod+'-kpis').innerHTML = '<div style="grid-column:span 5;padding:20px;text-align:center;color:#ef4444;font-size:13px">Erro ao carregar dados: '+e.message+'</div>';
