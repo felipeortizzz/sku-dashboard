@@ -880,7 +880,7 @@ tr:hover td{background:#fafaf9;}
           <button class="btn-sm" onclick="doMini()">Buscar</button>
         </div>
       </div>
-      <div class="layout">
+      <div class="layout" style="padding-top:8px">
         <div>
           <div class="card">
             <div class="hero" id="hero"></div>
@@ -1757,11 +1757,13 @@ function showProduct(cod){
   document.getElementById("margin-wrapper").innerHTML=renderMarginModule(cod,psku);
 
   openP=null;
+  // Scroll FIRST before showing content
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
+  window.scrollTo(0,0);
   document.getElementById("search-page").style.display="none";
   document.getElementById("cat-list-page").style.display="none";
   document.getElementById("prod-page").style.display="block";
-  document.documentElement.scrollTop=0;
-  document.body.scrollTop=0;
 }
 
 function doSearch(){
