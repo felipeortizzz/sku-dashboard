@@ -1758,10 +1758,14 @@ function showProduct(cod){
   document.getElementById("search-page").style.display="none";
   document.getElementById("cat-list-page").style.display="none";
   document.getElementById("prod-page").style.display="block";
-  // Scroll the module to top
-  const modEl = document.getElementById('module-produtos');
-  if(modEl) modEl.scrollTop = 0;
-  window.scrollTo(0,0);
+  setTimeout(()=>{
+    document.getElementById("hero")?.scrollIntoView({block:"start"});
+    window.scrollTo({top:0,behavior:"instant"});
+    document.documentElement.scrollTop=0;
+    document.body.scrollTop=0;
+    const main=document.getElementById("main");
+    if(main) main.scrollTop=0;
+  },10);
 }
 
 function doSearch(){
