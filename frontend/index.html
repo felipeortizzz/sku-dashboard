@@ -631,6 +631,91 @@ tr:hover td{background:#fafaf9;}
 .geo-count{font-size:10px;color:#a8a29e;width:50px;text-align:right;flex-shrink:0;}
 .us-map-svg{width:100%;max-height:200px;}
 
+
+/* ══════════════════════════════
+   TRACKING & RETURNS
+══════════════════════════════ */
+.ship-page{max-width:1200px;margin:0 auto;padding:24px 20px;}
+.ship-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.ship-header h2{font-size:22px;font-weight:800;color:#1c1917;margin-bottom:2px;}
+.ship-header p{font-size:13px;color:#78716c;}
+
+/* KPI grid */
+.ship-kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;}
+.ship-kpi{background:#fff;border:1px solid #e7e5e4;border-radius:10px;padding:16px 18px;position:relative;overflow:hidden;}
+.ship-kpi-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:10px 10px 0 0;}
+.ship-kpi-num{font-size:24px;font-weight:800;line-height:1.1;margin-bottom:4px;}
+.ship-kpi-lbl{font-size:11px;color:#78716c;font-weight:500;}
+.ship-kpi-sub{font-size:10px;color:#a8a29e;margin-top:3px;}
+
+/* Chart row */
+.ship-charts{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin-bottom:18px;}
+.ship-card{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;}
+.ship-card-head{padding:12px 16px;font-size:13px;font-weight:700;border-bottom:1px solid #f5f5f4;display:flex;align-items:center;gap:8px;}
+.ship-card-body{padding:12px 16px;}
+
+/* Status donut */
+.status-list{display:flex;flex-direction:column;gap:6px;padding:10px 16px;}
+.status-row{display:flex;align-items:center;gap:8px;}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.status-name{font-size:12px;color:#1c1917;font-weight:600;flex:1;}
+.status-bar-wrap{width:80px;height:8px;background:#f0efee;border-radius:4px;overflow:hidden;}
+.status-bar{height:100%;border-radius:4px;}
+.status-count{font-size:11px;color:#a8a29e;width:40px;text-align:right;flex-shrink:0;}
+
+/* Carrier list */
+.carrier-list{display:flex;flex-direction:column;gap:5px;padding:10px 16px;}
+.carrier-row{display:flex;align-items:center;gap:8px;}
+.carrier-logo{font-size:13px;width:22px;text-align:center;flex-shrink:0;}
+.carrier-name{font-size:12px;font-weight:600;color:#1c1917;width:70px;flex-shrink:0;}
+.carrier-bar-wrap{flex:1;height:8px;background:#f0efee;border-radius:4px;overflow:hidden;}
+.carrier-bar{height:100%;border-radius:4px;background:#1c1917;}
+.carrier-pct{font-size:11px;color:#a8a29e;width:36px;text-align:right;}
+
+/* Delivery time chart */
+.dtime-chart{display:flex;align-items:flex-end;gap:4px;height:80px;padding:0 16px 8px;}
+.dtime-col{display:flex;flex-direction:column;align-items:center;flex:1;}
+.dtime-bar{width:100%;background:#3b82f6;border-radius:2px 2px 0 0;min-height:2px;}
+.dtime-lbl{font-size:9px;color:#a8a29e;margin-top:3px;}
+
+/* Filters */
+.ship-filters{background:#fff;border:1px solid #e7e5e4;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+.ship-filter-group{display:flex;flex-direction:column;gap:3px;}
+.ship-filter-group label{font-size:10px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.04em;}
+.ship-filter-group select,.ship-filter-group input{padding:6px 10px;border:1px solid #e7e5e4;border-radius:7px;font-size:12px;color:#1c1917;background:#fff;outline:none;min-width:140px;}
+.ship-apply-btn{background:#1c1917;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;align-self:flex-end;}
+.ship-clear-btn{background:#fff;color:#57534e;border:1px solid #e7e5e4;border-radius:7px;padding:7px 10px;font-size:12px;cursor:pointer;align-self:flex-end;}
+
+/* Table */
+.ship-table-card{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;}
+.ship-table-info{padding:10px 16px;font-size:12px;color:#78716c;background:#fafaf9;border-bottom:1px solid #f0efee;display:flex;align-items:center;justify-content:space-between;}
+.ship-table{width:100%;border-collapse:collapse;font-size:12px;}
+.ship-table th{text-align:left;padding:8px 14px;font-size:10px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.04em;background:#fafaf9;border-bottom:1px solid #f0efee;white-space:nowrap;}
+.ship-table td{padding:9px 14px;border-bottom:1px solid #f5f5f4;vertical-align:middle;}
+.ship-table tr:hover td{background:#fafaf9;}
+
+/* Status badges */
+.sbadge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+.sb-delivered{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;}
+.sb-intransit{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}
+.sb-pending{background:#fafaf9;color:#78716c;border:1px solid #e7e5e4;}
+.sb-exception{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;}
+.sb-ofd{background:#fdf4ff;color:#7c3aed;border:1px solid #e9d5ff;}
+.sb-expired{background:#fffbeb;color:#b45309;border:1px solid #fde68a;}
+.sb-attempt{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;}
+.sb-info{background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;}
+
+.ship-pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #f0efee;}
+.ship-pg-btn{background:#fff;border:1px solid #e7e5e4;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;color:#57534e;}
+.ship-pg-btn:hover:not(:disabled){background:#f5f5f4;}
+.ship-pg-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+@media(max-width:768px){
+  .ship-kpi-grid{grid-template-columns:repeat(2,1fr)!important;}
+  .ship-charts{grid-template-columns:1fr!important;}
+  .ship-page{padding:14px 12px!important;}
+}
+
 </style>
 </head>
 <body>
@@ -684,6 +769,17 @@ tr:hover td{background:#fafaf9;}
   <button class="nav-item" id="nav-vendas" onclick="switchModule('vendas')">
     <span class="nav-icon">💰</span>
     <span class="nav-label">Relatório de Vendas</span>
+  </button>
+
+  <!-- GRUPO: LOGÍSTICA -->
+  <div class="sidebar-section">Logística</div>
+  <button class="nav-item" id="nav-tracking" onclick="switchModule('tracking')">
+    <span class="nav-icon">📦</span>
+    <span class="nav-label">Track & Trace</span>
+  </button>
+  <button class="nav-item" id="nav-returns" onclick="switchModule('returns')">
+    <span class="nav-icon">↩</span>
+    <span class="nav-label">Devoluções</span>
   </button>
 
   <!-- GRUPO: PRODUTOS -->
@@ -883,17 +979,6 @@ tr:hover td{background:#fafaf9;}
             <div class="dash-loading">Carregando...</div>
           </div>
         </div>
-        <!-- MAPA GEO -->
-        <div class="dash-card">
-          <div class="dash-card-head">
-            <span class="dash-card-icon" style="background:#eff6ff;color:#2563eb">🌎</span>
-            Destino dos pedidos
-            <span class="dash-card-sub">Por receita</span>
-          </div>
-          <div class="geo-wrap" id="dash-geo-body">
-            <div class="dash-loading">Carregando...</div>
-          </div>
-        </div>
       </div>
 
     </div>
@@ -939,6 +1024,22 @@ tr:hover td{background:#fafaf9;}
 
       <!-- DASHBOARD -->
       <div id="vendas-dash"></div>
+
+      <!-- MAPA GEO -->
+      <div class="vc-row" style="margin-bottom:14px">
+        <div class="vc-card" style="flex:1">
+          <div class="vc-card-head">🌎 Destino dos pedidos</div>
+          <div style="padding:0">
+            <div class="geo-tabs" style="padding:10px 16px 0">
+              <button class="geo-tab active" onclick="renderGeo('countries')" id="geo-tab-countries">🌎 Países</button>
+              <button class="geo-tab" onclick="renderGeo('states')" id="geo-tab-states">🇺🇸 Estados EUA</button>
+            </div>
+            <div id="vendas-geo-body" style="padding:10px 16px">
+              <div style="font-size:13px;color:#a8a29e;text-align:center;padding:20px">Carregando...</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- TABELA -->
       <div class="vc-card" style="margin-top:16px">
@@ -1127,6 +1228,161 @@ tr:hover td{background:#fafaf9;}
   </div>
 
 
+
+  <!-- ── MÓDULO: TRACK & TRACE ── -->
+  <div class="module" id="module-tracking">
+    <div class="ship-page">
+      <div class="ship-header">
+        <div>
+          <h2>📦 Track & Trace</h2>
+          <p>Monitoramento de envios — rastreamento em tempo real</p>
+        </div>
+        <button class="ship-apply-btn" onclick="exportTracking()">⬇ Exportar Excel</button>
+      </div>
+
+      <!-- KPIs -->
+      <div class="ship-kpi-grid" id="tracking-kpis"></div>
+
+      <!-- CHARTS -->
+      <div class="ship-charts">
+        <div class="ship-card">
+          <div class="ship-card-head">📅 Envios por semana</div>
+          <div class="ship-card-body" id="tracking-weekly" style="padding:8px 0"></div>
+        </div>
+        <div class="ship-card">
+          <div class="ship-card-head">📊 Por status</div>
+          <div class="status-list" id="tracking-status-chart"></div>
+        </div>
+        <div class="ship-card">
+          <div class="ship-card-head">🚚 Por transportadora</div>
+          <div class="carrier-list" id="tracking-carrier-chart"></div>
+        </div>
+      </div>
+
+      <!-- FILTERS -->
+      <div class="ship-filters">
+        <div class="ship-filter-group">
+          <label>Status</label>
+          <select id="tracking-f-status" onchange="applyTrackingFilters()"><option value="">Todos</option></select>
+        </div>
+        <div class="ship-filter-group">
+          <label>Transportadora</label>
+          <select id="tracking-f-carrier" onchange="applyTrackingFilters()"><option value="">Todas</option></select>
+        </div>
+        <div class="ship-filter-group">
+          <label>Data início</label>
+          <input type="date" id="tracking-f-from" onchange="applyTrackingFilters()">
+        </div>
+        <div class="ship-filter-group">
+          <label>Data fim</label>
+          <input type="date" id="tracking-f-to" onchange="applyTrackingFilters()">
+        </div>
+        <div class="ship-filter-group">
+          <label>Buscar rastreio / pedido</label>
+          <input type="text" id="tracking-f-q" placeholder="Tracking # ou Order ID..." oninput="applyTrackingFilters()">
+        </div>
+        <button class="ship-clear-btn" onclick="clearTrackingFilters()">✕</button>
+      </div>
+
+      <!-- TABLE -->
+      <div class="ship-table-card">
+        <div class="ship-table-info">
+          <span id="tracking-table-info">—</span>
+          <span id="tracking-pg-info" style="font-size:11px;color:#a8a29e"></span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="ship-table">
+            <thead id="tracking-thead"></thead>
+            <tbody id="tracking-tbody"></tbody>
+          </table>
+        </div>
+        <div class="ship-pagination">
+          <button class="ship-pg-btn" id="tracking-pg-prev" onclick="trackingGoPage(-1)">‹ Anterior</button>
+          <span id="tracking-pg-lbl" style="font-size:12px;color:#78716c"></span>
+          <button class="ship-pg-btn" id="tracking-pg-next" onclick="trackingGoPage(1)">Próxima ›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── MÓDULO: DEVOLUÇÕES ── -->
+  <div class="module" id="module-returns">
+    <div class="ship-page">
+      <div class="ship-header">
+        <div>
+          <h2>↩ Devoluções</h2>
+          <p>Controle de rastreios de retorno — barracão e fornecedores</p>
+        </div>
+        <button class="ship-apply-btn" onclick="exportReturns()">⬇ Exportar Excel</button>
+      </div>
+
+      <!-- KPIs -->
+      <div class="ship-kpi-grid" id="returns-kpis"></div>
+
+      <!-- CHARTS -->
+      <div class="ship-charts">
+        <div class="ship-card">
+          <div class="ship-card-head">📅 Envios por semana</div>
+          <div class="ship-card-body" id="returns-weekly" style="padding:8px 0"></div>
+        </div>
+        <div class="ship-card">
+          <div class="ship-card-head">📊 Por status</div>
+          <div class="status-list" id="returns-status-chart"></div>
+        </div>
+        <div class="ship-card">
+          <div class="ship-card-head">🚚 Por transportadora</div>
+          <div class="carrier-list" id="returns-carrier-chart"></div>
+        </div>
+      </div>
+
+      <!-- FILTERS -->
+      <div class="ship-filters">
+        <div class="ship-filter-group">
+          <label>Status</label>
+          <select id="returns-f-status" onchange="applyReturnsFilters()"><option value="">Todos</option></select>
+        </div>
+        <div class="ship-filter-group">
+          <label>Transportadora</label>
+          <select id="returns-f-carrier" onchange="applyReturnsFilters()"><option value="">Todas</option></select>
+        </div>
+        <div class="ship-filter-group">
+          <label>Data início</label>
+          <input type="date" id="returns-f-from" onchange="applyReturnsFilters()">
+        </div>
+        <div class="ship-filter-group">
+          <label>Data fim</label>
+          <input type="date" id="returns-f-to" onchange="applyReturnsFilters()">
+        </div>
+        <div class="ship-filter-group">
+          <label>Buscar rastreio / pedido</label>
+          <input type="text" id="returns-f-q" placeholder="Tracking # ou Order ID..." oninput="applyReturnsFilters()">
+        </div>
+        <button class="ship-clear-btn" onclick="clearReturnsFilters()">✕</button>
+      </div>
+
+      <!-- TABLE -->
+      <div class="ship-table-card">
+        <div class="ship-table-info">
+          <span id="returns-table-info">—</span>
+          <span id="returns-pg-info" style="font-size:11px;color:#a8a29e"></span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="ship-table">
+            <thead id="returns-thead"></thead>
+            <tbody id="returns-tbody"></tbody>
+          </table>
+        </div>
+        <div class="ship-pagination">
+          <button class="ship-pg-btn" id="returns-pg-prev" onclick="returnsGoPage(-1)">‹ Anterior</button>
+          <span id="returns-pg-lbl" style="font-size:12px;color:#78716c"></span>
+          <button class="ship-pg-btn" id="returns-pg-next" onclick="returnsGoPage(1)">Próxima ›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <!-- ── MÓDULO: CRUZAMENTO ── -->
   <div class="module module-cruz" id="module-cruzamento">
     <div class="app">
@@ -1183,11 +1439,16 @@ function switchModule(name) {
     initProdutos();
   } else if (name === 'listing') {
     initListing();
+  } else if (name === 'tracking') {
+    initShipModule('tracking');
+  } else if (name === 'returns') {
+    initShipModule('returns');
   } else if (name === 'reprec') {
     if(produtosLoaded) setTimeout(buildReprec, 50);
     else initProdutos();
   } else if (name === 'vendas') {
     if(SALES) { populateVendasFilters(); setTimeout(buildVendas,50); }
+    if(GEO) setTimeout(()=>renderGeo('countries'),200);
   } else if (name === 'dashboard') {
     if(produtosLoaded) setTimeout(buildDashboard,50);
     else initProdutos();
@@ -1229,7 +1490,7 @@ async function initProdutos(){
     PX=await fetchData("data/pricing.json");prg(90);
     try{TAXA=await fetchData("data/taxa.json");}catch(e){TAXA={};}
     try{SALES=await fetchData("data/sales.json");populateVendasFilters();}catch(e){SALES=[];}
-    try{VEL=await decompress(D.vel);GEO=await decompress(D.geo);}catch(e){VEL={};GEO={};}
+    try{VEL=await fetchData('data/velocity.json');GEO=await fetchData('data/geo.json');}catch(e){VEL={};GEO={};}
     PAUSED=new Set(Object.keys(PI).filter(k=>PI[k].paused));prg(100);
     await new Promise(r=>setTimeout(r,150));
     document.getElementById("loading").style.display="none";
@@ -2159,8 +2420,6 @@ function buildDashboard() {
 
   // Critical stock + geo
   setTimeout(renderCriticalStock, 100);
-  setTimeout(()=>renderGeo('countries'), 100);
-
   // Categories
   const sortedCats = Object.entries(catCounts).sort((a,b) => b[1]-a[1]);
   const maxCat = sortedCats[0]?.[1] || 1;
@@ -3132,13 +3391,10 @@ let geoMode = 'countries';
 
 function renderGeo(mode) {
   geoMode = mode || geoMode;
-  const body = document.getElementById('dash-geo-body');
+  const body = document.getElementById('vendas-geo-body') || document.getElementById('dash-geo-body');
   if (!body || !GEO) return;
 
-  const tabsHtml = `<div class="geo-tabs">
-    <button class="geo-tab ${geoMode==='countries'?'active':''}" onclick="renderGeo('countries')">🌎 Países</button>
-    <button class="geo-tab ${geoMode==='states'?'active':''}" onclick="renderGeo('states')">🇺🇸 Estados EUA</button>
-  </div>`;
+  const tabsHtml = '';
 
   if (geoMode === 'countries') {
     const data = GEO.countries || {};
@@ -3191,6 +3447,293 @@ const STATE_NAMES = {
   MS:'Mississippi',IA:'Iowa',KS:'Kansas',UT:'Utah',OR:'Oregon',
   CT:'Connecticut',PR:'Puerto Rico',WV:'West Virginia',HI:'Hawaii',
 };
+
+
+const STATUS_CFG = {
+  'Delivered':          {cls:'sb-delivered', icon:'✓', color:'#22c55e'},
+  'InTransit':          {cls:'sb-intransit',  icon:'🚚', color:'#3b82f6'},
+  'Pending':            {cls:'sb-pending',    icon:'⏳', color:'#78716c'},
+  'OutForDelivery':     {cls:'sb-ofd',        icon:'📦', color:'#7c3aed'},
+  'Exception':          {cls:'sb-exception',  icon:'⚠', color:'#ef4444'},
+  'Expired':            {cls:'sb-expired',    icon:'✗',  color:'#f59e0b'},
+  'AttemptFail':        {cls:'sb-attempt',    icon:'↩',  color:'#f97316'},
+  'InfoReceived':       {cls:'sb-info',       icon:'ℹ',  color:'#0ea5e9'},
+  'AvailableForPickup': {cls:'sb-ofd',        icon:'🏪', color:'#7c3aed'},
+};
+const CARRIER_CFG = {
+  'ups':    {icon:'🟤', color:'#7b4f2e', name:'UPS'},
+  'fedex':  {icon:'🟣', color:'#4d148c', name:'FedEx'},
+  'usps':   {icon:'🔵', color:'#004b87', name:'USPS'},
+  'amazon': {icon:'🟡', color:'#ff9900', name:'Amazon'},
+  'yunexpress':{icon:'🔴',color:'#e00',name:'Yunexpress'},
+  'gofo':   {icon:'⚪', color:'#666',   name:'GoFo'},
+  'yanwen': {icon:'⚪', color:'#666',   name:'Yanwen'},
+};
+
+// ══════════════════════════════════════════════════════
+//  TRACKING & RETURNS ENGINE
+// ══════════════════════════════════════════════════════
+
+let TRACKING_DATA = null, RETURNS_DATA = null;
+let trackingFiltered = [], returnsFiltered = [];
+let trackingPage = 0, returnsPage = 0;
+const SHIP_PAGE = 50;
+
+async function initShipModule(mod) {
+  const isRet = mod === 'returns';
+  const key   = isRet ? 'RETURNS_DATA' : 'TRACKING_DATA';
+  
+  if (window[key]) {
+    buildShipDash(mod);
+    return;
+  }
+  
+  // Show loading
+  document.getElementById(mod+'-kpis').innerHTML = '<div style="grid-column:span 5;padding:20px;text-align:center;color:#a8a29e;font-size:13px">Carregando dados...</div>';
+  
+  try {
+    const data = await fetchData('data/' + (isRet ? 'returns' : 'tracking') + '.json');
+    window[key] = data;
+    buildShipDash(mod);
+  } catch(e) {
+    document.getElementById(mod+'-kpis').innerHTML = '<div style="grid-column:span 5;padding:20px;text-align:center;color:#ef4444;font-size:13px">Erro ao carregar dados: '+e.message+'</div>';
+  }
+}
+
+function getShipRows(mod) {
+  const data = mod === 'returns' ? RETURNS_DATA : TRACKING_DATA;
+  if (!data || !data.rows) return [];
+  return data.rows.map(r => ({
+    trk:      r[0], order: r[1],
+    status:   data.statuses[r[2]] || '',
+    carrier:  data.carriers[r[3]] || '',
+    stype:    data.stypes[r[4]]   || '',
+    created:  r[5], pickup: r[6], delivered: r[7], scheduled: r[8],
+    days:     r[9],
+    state:    r[10], country: r[11],
+    last_msg: r[12], subtag: r[13],
+    item:     r[14] || '',
+  }));
+}
+
+function buildShipDash(mod) {
+  const rows = getShipRows(mod);
+  populateShipFilters(mod, rows);
+  applyShipFilters(mod, rows);
+}
+
+function populateShipFilters(mod, rows) {
+  const statuses = [...new Set(rows.map(r=>r.status))].sort();
+  const carriers = [...new Set(rows.map(r=>r.carrier))].sort();
+  const dates    = rows.map(r=>r.created).filter(Boolean).sort();
+
+  const sSel = document.getElementById(mod+'-f-status');
+  const cSel = document.getElementById(mod+'-f-carrier');
+  if(sSel) sSel.innerHTML = '<option value="">Todos</option>' + statuses.map(s=>`<option>${s}</option>`).join('');
+  if(cSel) cSel.innerHTML = '<option value="">Todas</option>' + carriers.map(c=>`<option>${c}</option>`).join('');
+  
+  const fFrom = document.getElementById(mod+'-f-from');
+  const fTo   = document.getElementById(mod+'-f-to');
+  if(fFrom && dates[0]) fFrom.value = dates[0];
+  if(fTo   && dates[dates.length-1]) fTo.value = dates[dates.length-1];
+}
+
+function applyShipFilters(mod, allRows) {
+  const rows    = allRows || getShipRows(mod);
+  const status  = (document.getElementById(mod+'-f-status')||{}).value||'';
+  const carrier = (document.getElementById(mod+'-f-carrier')||{}).value||'';
+  const from    = (document.getElementById(mod+'-f-from')||{}).value||'';
+  const to      = (document.getElementById(mod+'-f-to')||{}).value||'';
+  const q       = ((document.getElementById(mod+'-f-q')||{}).value||'').toLowerCase();
+
+  const filtered = rows.filter(r => {
+    if(status  && r.status  !== status)  return false;
+    if(carrier && r.carrier !== carrier) return false;
+    if(from    && r.created < from)      return false;
+    if(to      && r.created > to)        return false;
+    if(q && !r.trk.toLowerCase().includes(q) && !r.order.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  if(mod==='tracking'){ trackingFiltered=filtered; trackingPage=0; }
+  else                { returnsFiltered=filtered;  returnsPage=0;  }
+
+  renderShipKPIs(mod, filtered);
+  renderShipCharts(mod, filtered);
+  renderShipTable(mod, filtered);
+}
+
+function applyTrackingFilters(){ applyShipFilters('tracking'); }
+function applyReturnsFilters(){  applyShipFilters('returns');  }
+function clearTrackingFilters(){ clearShipFilters('tracking'); }
+function clearReturnsFilters(){  clearShipFilters('returns');  }
+
+function clearShipFilters(mod) {
+  ['f-status','f-carrier','f-from','f-to','f-q'].forEach(id => {
+    const el = document.getElementById(mod+'-'+id);
+    if(el) el.value='';
+  });
+  applyShipFilters(mod);
+}
+
+function renderShipKPIs(mod, rows) {
+  const total     = rows.length;
+  const delivered = rows.filter(r=>r.status==='Delivered').length;
+  const intransit = rows.filter(r=>r.status==='InTransit'||r.status==='OutForDelivery').length;
+  const issues    = rows.filter(r=>r.status==='Exception'||r.status==='AttemptFail'||r.status==='Expired').length;
+  const avgDays   = rows.filter(r=>r.days).reduce((s,r,_,a)=>s+r.days/a.filter(x=>x.days).length,0);
+  const delivRate = total>0?(delivered/total*100).toFixed(1):0;
+
+  document.getElementById(mod+'-kpis').innerHTML = `
+    <div class="ship-kpi"><div class="ship-kpi-accent" style="background:#3b82f6"></div>
+      <div class="ship-kpi-num" style="color:#3b82f6">${total.toLocaleString()}</div>
+      <div class="ship-kpi-lbl">Total de envios</div>
+    </div>
+    <div class="ship-kpi"><div class="ship-kpi-accent" style="background:#22c55e"></div>
+      <div class="ship-kpi-num" style="color:#22c55e">${delivered.toLocaleString()}</div>
+      <div class="ship-kpi-lbl">Entregues</div>
+      <div class="ship-kpi-sub">${delivRate}% taxa de entrega</div>
+    </div>
+    <div class="ship-kpi"><div class="ship-kpi-accent" style="background:#7c3aed"></div>
+      <div class="ship-kpi-num" style="color:#7c3aed">${intransit.toLocaleString()}</div>
+      <div class="ship-kpi-lbl">Em trânsito</div>
+    </div>
+    <div class="ship-kpi"><div class="ship-kpi-accent" style="background:#ef4444"></div>
+      <div class="ship-kpi-num" style="color:#ef4444">${issues.toLocaleString()}</div>
+      <div class="ship-kpi-lbl">Problemas</div>
+      <div class="ship-kpi-sub">Exceções + falhas + expirados</div>
+    </div>
+    <div class="ship-kpi"><div class="ship-kpi-accent" style="background:#f59e0b"></div>
+      <div class="ship-kpi-num" style="color:#f59e0b">${avgDays>0?avgDays.toFixed(1):'—'}</div>
+      <div class="ship-kpi-lbl">Dias médios de entrega</div>
+    </div>
+  `;
+}
+
+function renderShipCharts(mod, rows) {
+  // Weekly chart
+  const weekly = {};
+  rows.forEach(r => {
+    if(!r.created) return;
+    const d = new Date(r.created);
+    const wk = r.created.slice(0,7); // group by month for simplicity
+    weekly[wk] = (weekly[wk]||0)+1;
+  });
+  const months = Object.keys(weekly).sort();
+  const maxW   = Math.max(...Object.values(weekly),1);
+  const weeklyHtml = `<div style="display:flex;align-items:flex-end;gap:4px;height:100px;padding:8px 16px 24px;overflow-x:auto">` +
+    months.map(m=>{
+      const h=(weekly[m]/maxW*80).toFixed(0);
+      const mo=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(m.slice(5))-1];
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:32px">
+        <div style="font-size:9px;color:#a8a29e;margin-bottom:2px">${weekly[m]}</div>
+        <div style="width:100%;height:${h}px;background:#1c1917;border-radius:2px 2px 0 0;min-height:2px"></div>
+        <div style="font-size:9px;color:#78716c;margin-top:3px">${mo}</div>
+      </div>`;
+    }).join('') + '</div>';
+  document.getElementById(mod+'-weekly').innerHTML = weeklyHtml;
+
+  // Status chart
+  const bySt = {};
+  rows.forEach(r=>{ bySt[r.status]=(bySt[r.status]||0)+1; });
+  const maxSt = Math.max(...Object.values(bySt),1);
+  document.getElementById(mod+'-status-chart').innerHTML = Object.entries(bySt)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([st,n])=>{
+      const cfg = STATUS_CFG[st]||{color:'#a8a29e',icon:'?'};
+      return `<div class="status-row">
+        <div class="status-dot" style="background:${cfg.color}"></div>
+        <span class="status-name">${cfg.icon} ${st}</span>
+        <div class="status-bar-wrap"><div class="status-bar" style="width:${(n/maxSt*100).toFixed(0)}%;background:${cfg.color}"></div></div>
+        <span class="status-count">${n}</span>
+      </div>`;
+    }).join('');
+
+  // Carrier chart
+  const byCar = {};
+  rows.forEach(r=>{ byCar[r.carrier]=(byCar[r.carrier]||0)+1; });
+  const maxCar = Math.max(...Object.values(byCar),1);
+  document.getElementById(mod+'-carrier-chart').innerHTML = Object.entries(byCar)
+    .sort((a,b)=>b[1]-a[1]).slice(0,7)
+    .map(([car,n])=>{
+      const cfg = CARRIER_CFG[car]||{icon:'📮',name:car};
+      const pct = (n/maxCar*100).toFixed(0);
+      return `<div class="carrier-row">
+        <span class="carrier-logo">${cfg.icon}</span>
+        <span class="carrier-name">${cfg.name||car}</span>
+        <div class="carrier-bar-wrap"><div class="carrier-bar" style="width:${pct}%;background:${cfg.color||'#1c1917'}"></div></div>
+        <span class="carrier-pct">${n}</span>
+      </div>`;
+    }).join('');
+}
+
+function renderShipTable(mod, rows) {
+  const page    = mod==='tracking' ? trackingPage : returnsPage;
+  const pRows   = rows.slice(page*SHIP_PAGE, (page+1)*SHIP_PAGE);
+  const pages   = Math.ceil(rows.length/SHIP_PAGE);
+  const isRet   = mod==='returns';
+
+  document.getElementById(mod+'-table-info').textContent =
+    rows.length.toLocaleString()+' envios encontrados';
+  document.getElementById(mod+'-pg-info').textContent =
+    `Página ${page+1} de ${pages}`;
+  document.getElementById(mod+'-pg-lbl').textContent =
+    `${page+1} / ${pages}`;
+  document.getElementById(mod+'-pg-prev').disabled = page===0;
+  document.getElementById(mod+'-pg-next').disabled = page>=pages-1;
+
+  // Header
+  document.getElementById(mod+'-thead').innerHTML = `<tr>
+    <th>Rastreio</th>
+    <th>Pedido</th>
+    ${isRet ? '<th>Produto</th>' : ''}
+    <th>Status</th>
+    <th>Transportadora</th>
+    <th>Tipo</th>
+    <th>Enviado</th>
+    <th>Entregue</th>
+    <th>Dias</th>
+    <th>Destino</th>
+    <th>Última mensagem</th>
+  </tr>`;
+
+  document.getElementById(mod+'-tbody').innerHTML = pRows.map(r=>{
+    const cfg  = STATUS_CFG[r.status]||{cls:'sb-pending',icon:'?'};
+    const carr = CARRIER_CFG[r.carrier]||{icon:'📮'};
+    return `<tr>
+      <td><span style="font-family:monospace;font-size:10px;font-weight:700;color:#1d4ed8">${r.trk.slice(0,20)}</span></td>
+      <td><span style="font-family:monospace;font-size:11px;font-weight:700;color:#7c3aed;cursor:pointer" onclick="switchModule('vendas');setTimeout(()=>{vendasFiltered=SALES?.filter?.(s=>s.id===\'${r.order.replace(/'/g,"")}\')||[];renderVendasTable();},200)">${r.order}</span></td>
+      ${isRet ? `<td style="font-size:11px;color:#57534e;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.item}">${r.item.slice(0,35)||'—'}</td>` : ''}
+      <td><span class="sbadge ${cfg.cls}">${cfg.icon} ${r.status}</span></td>
+      <td><span style="font-size:11px">${carr.icon} ${r.carrier.toUpperCase()}</span></td>
+      <td style="font-size:11px;color:#78716c">${r.stype.slice(0,20)||'—'}</td>
+      <td style="font-size:11px;color:#57534e">${r.pickup||r.created||'—'}</td>
+      <td style="font-size:11px;color:#57534e">${r.delivered||'—'}</td>
+      <td style="text-align:center;font-weight:700;font-size:12px;color:${r.days>10?'#f59e0b':'#57534e'}">${r.days??'—'}</td>
+      <td style="font-size:11px;color:#78716c">${r.state||r.country||'—'}</td>
+      <td style="font-size:10px;color:#a8a29e;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.last_msg}">${r.last_msg.slice(0,40)||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function trackingGoPage(dir) { trackingPage=Math.max(0,trackingPage+dir); renderShipTable('tracking',trackingFiltered); document.getElementById('module-tracking').scrollIntoView(); }
+function returnsGoPage(dir)  { returnsPage=Math.max(0,returnsPage+dir);   renderShipTable('returns',returnsFiltered);   document.getElementById('module-returns').scrollIntoView(); }
+
+function exportTracking() { exportShip('tracking'); }
+function exportReturns()  { exportShip('returns');  }
+
+function exportShip(mod) {
+  if(typeof XLSX==='undefined'){alert('XLSX não carregado');return;}
+  const rows = mod==='tracking' ? trackingFiltered : returnsFiltered;
+  if(!rows.length){alert('Nenhum dado para exportar.');return;}
+  const isRet = mod==='returns';
+  const header = ['Tracking','Pedido',isRet?'Produto':'Tipo','Status','Transportadora','Tipo Envio','Enviado','Entregue','Dias','Estado','País','Última mensagem'];
+  const data = [header, ...rows.map(r=>[r.trk,r.order,isRet?r.item:r.stype,r.status,r.carrier,r.stype,r.pickup||r.created,r.delivered,r.days,r.state,r.country,r.last_msg])];
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb,ws,mod);
+  XLSX.writeFile(wb,mod+'_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
 
 // ── INIT ──
 initProdutos();
