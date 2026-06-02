@@ -121,7 +121,7 @@ input[type=text]::placeholder{color:#a8a29e;}
 .chip:hover{border-color:#a8a29e;color:#1c1917;}
 
 .prod-page{display:none;}
-.sub-bar{background:#fff;border-bottom:1px solid #e7e5e4;padding:0 20px;display:flex;align-items:center;gap:12px;height:46px;position:sticky;top:56px;z-index:99;}
+.sub-bar{background:#fff;border-bottom:1px solid #e7e5e4;padding:0 20px;display:flex;align-items:center;gap:12px;height:46px;position:sticky;top:52px;z-index:99;}
 .back-btn{border:none;background:none;font-size:13px;color:#78716c;cursor:pointer;}
 .back-btn:hover{color:#1c1917;}
 .breadcrumb{font-size:13px;color:#a8a29e;}
@@ -836,6 +836,7 @@ tr:hover td{background:#fafaf9;}
               <th style="text-align:left;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;padding:0 18px 10px;letter-spacing:.04em;">SKU</th>
               <th style="text-align:left;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;padding:0 18px 10px;letter-spacing:.04em;">Produto</th>
               <th style="text-align:left;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;padding:0 18px 10px;letter-spacing:.04em;">Status</th>
+              <th style="text-align:left;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;padding:0 18px 10px;letter-spacing:.04em;">Vendas 90d</th>
               <th style="text-align:left;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;padding:0 18px 10px;letter-spacing:.04em;">Custo</th>
               <th style="width:80px;"></th>
             </tr>
@@ -1733,6 +1734,7 @@ function showProduct(cod){
       ${gdiff>1?`<span class="tag t-warn">⚠ ${dc} divergente${dc!==1?"s":""} · ${gdiff.toFixed(1)}%</span>`:""}
       ${allSkuPrices.length&&gdiff<=1?`<span class="tag t-ok">✓ Preços alinhados</span>`:""}
       ${isPaused?`<span class="tag t-red">⏸ Inativado — preço manual</span>`:""}
+      ${getSalesForSku(psku)}
     </div>`;
 
   let rows="",panels="";
@@ -2204,6 +2206,7 @@ function renderCatList(items) {
       <td style="padding:10px 18px;font-family:monospace;font-size:12px;font-weight:700;color:#1d4ed8;border-top:1px solid #f5f5f4;">${p.sku}</td>
       <td style="padding:10px 18px;font-size:12px;color:#57534e;border-top:1px solid #f5f5f4;">${(p.name || '').slice(0, 60)}</td>
       <td style="padding:10px 18px;font-size:12px;border-top:1px solid #f5f5f4;">${statusDot(status)}${status}</td>
+      <td style="padding:10px 18px;font-size:12px;border-top:1px solid #f5f5f4;color:#059669;font-weight:600">${VEL&&(VEL[p.sku.toUpperCase()]||VEL[p.sku])?(VEL[p.sku.toUpperCase()]||VEL[p.sku])+' vendas':''}</td>
       <td style="padding:10px 18px;font-size:12px;font-weight:700;border-top:1px solid #f5f5f4;">${cost}</td>
       <td style="padding:10px 18px;border-top:1px solid #f5f5f4;text-align:right;"><span style="font-size:11px;color:#a8a29e;">Ver ›</span></td>
     </tr>`;
@@ -3733,6 +3736,17 @@ function exportShip(mod) {
   const ws=XLSX.utils.aoa_to_sheet(data);
   XLSX.utils.book_append_sheet(wb,ws,mod);
   XLSX.writeFile(wb,mod+'_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+
+
+function getSalesForSku(sku) {
+  if (!VEL) return '';
+  const qty = VEL[sku.toUpperCase()] || VEL[sku] || 0;
+  if (!qty) return '';
+  const color = qty >= 100 ? '#059669' : qty >= 20 ? '#2563eb' : '#78716c';
+  return `<span class="tag" style="background:${color}10;color:${color};border:1px solid ${color}30">
+    📦 ${qty} vendas (90d)
+  </span>`;
 }
 
 // ── INIT ──
