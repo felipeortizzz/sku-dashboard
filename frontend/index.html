@@ -8,6 +8,7 @@
 <style>
 /* ── RESET ── */
 *{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-padding-top:100px;}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#f6f6f5;color:#1c1917;min-height:100vh;display:flex;flex-direction:column;}
 
 /* ── TOPBAR ── */
@@ -86,6 +87,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f6f6f5;color:#1c1917;mi
 
 /* ── PRODUTOS MODULE CSS ── */
 *{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-padding-top:100px;}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#f6f6f5;color:#1c1917;min-height:100vh;}
 
 .topbar-produtos-sub{background:#fff;border-bottom:1px solid #e7e5e4;padding:0 28px;display:flex;align-items:center;gap:14px;height:56px;position:sticky;top:0;z-index:100;}
@@ -1758,14 +1760,8 @@ function showProduct(cod){
   document.getElementById("search-page").style.display="none";
   document.getElementById("cat-list-page").style.display="none";
   document.getElementById("prod-page").style.display="block";
-  setTimeout(()=>{
-    document.getElementById("hero")?.scrollIntoView({block:"start"});
-    window.scrollTo({top:0,behavior:"instant"});
-    document.documentElement.scrollTop=0;
-    document.body.scrollTop=0;
-    const main=document.getElementById("main");
-    if(main) main.scrollTop=0;
-  },10);
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
 }
 
 function doSearch(){
