@@ -523,6 +523,59 @@ tr:hover td{background:#fafaf9;}
   .reprec-mp-tabs{flex-wrap:wrap;}
 }
 
+
+/* ══════════════════════════════
+   CRIAÇÃO DE ANÚNCIOS
+══════════════════════════════ */
+.listing-page{max-width:1100px;margin:0 auto;padding:24px 20px;}
+.listing-header{margin-bottom:24px;}
+.listing-header h2{font-size:22px;font-weight:800;color:#1c1917;margin-bottom:4px;}
+.listing-header p{font-size:13px;color:#78716c;}
+.listing-steps{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.listing-step{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;}
+.listing-step-head{padding:13px 18px;font-size:13px;font-weight:700;border-bottom:1px solid #f5f5f4;display:flex;align-items:center;gap:10px;}
+.listing-step-num{width:22px;height:22px;border-radius:50%;background:#1c1917;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.listing-step-body{padding:16px 18px;}
+.listing-drop{border:2px dashed #e7e5e4;border-radius:8px;padding:28px;text-align:center;cursor:pointer;transition:all .15s;}
+.listing-drop:hover,.listing-drop.over{border-color:#1c1917;background:#fafaf9;}
+.listing-drop-icon{font-size:28px;margin-bottom:8px;}
+.listing-drop p{font-size:13px;color:#78716c;}
+.listing-drop small{font-size:11px;color:#a8a29e;margin-top:4px;display:block;}
+.listing-file-ok{display:none;align-items:center;gap:10px;padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:13px;color:#15803d;font-weight:600;}
+.listing-form-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+.listing-field{display:flex;flex-direction:column;gap:4px;}
+.listing-field label{font-size:10px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.04em;}
+.listing-field input,.listing-field select{padding:8px 10px;border:1px solid #e7e5e4;border-radius:7px;font-size:13px;color:#1c1917;background:#fff;outline:none;}
+.listing-field input:focus,.listing-field select:focus{border-color:#a8a29e;}
+.listing-field input.error{border-color:#ef4444;}
+.listing-add-btn{background:#1c1917;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px;}
+.listing-add-btn:hover{background:#292524;}
+.listing-add-btn:disabled{opacity:.4;cursor:not-allowed;}
+.listing-clear-btn{background:#fff;color:#57534e;border:1px solid #e7e5e4;border-radius:8px;padding:9px 14px;font-size:13px;cursor:pointer;margin-top:4px;}
+.listing-results{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;margin-top:16px;}
+.listing-results-head{padding:13px 18px;font-size:13px;font-weight:700;border-bottom:1px solid #f5f5f4;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.listing-export-row{display:flex;gap:8px;flex-wrap:wrap;}
+.listing-exp-btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#fff;}
+.listing-item{border-bottom:1px solid #f5f5f4;padding:14px 18px;}
+.listing-item:last-child{border-bottom:none;}
+.listing-item-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.listing-item-sku{font-family:monospace;font-size:12px;font-weight:700;color:#1d4ed8;}
+.listing-item-cat{font-size:11px;color:#78716c;background:#f5f5f4;border-radius:4px;padding:2px 7px;}
+.listing-item-price{font-size:13px;font-weight:700;color:#1c1917;margin-left:auto;}
+.listing-titles{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.listing-title-card{border:1px solid #e7e5e4;border-radius:8px;padding:12px;}
+.listing-title-mp{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.listing-title-edit{width:100%;font-size:12px;border:1px solid #e7e5e4;border-radius:6px;padding:6px 8px;resize:vertical;min-height:52px;font-family:inherit;outline:none;color:#1c1917;}
+.listing-title-edit:focus{border-color:#a8a29e;}
+.listing-char-count{font-size:10px;text-align:right;margin-top:2px;}
+.listing-char-ok{color:#22c55e;}.listing-char-warn{color:#f59e0b;}.listing-char-over{color:#ef4444;}
+.listing-empty{padding:40px;text-align:center;color:#a8a29e;font-size:13px;}
+@media(max-width:768px){
+  .listing-steps{grid-template-columns:1fr!important;}
+  .listing-form-row{grid-template-columns:1fr 1fr!important;}
+  .listing-titles{grid-template-columns:1fr!important;}
+}
+
 </style>
 </head>
 <body>
@@ -567,6 +620,10 @@ tr:hover td{background:#fafaf9;}
 
   <!-- GRUPO: FERRAMENTAS -->
   <div class="sidebar-section">Ferramentas</div>
+  <button class="nav-item" id="nav-listing" onclick="switchModule('listing')">
+    <span class="nav-icon">📝</span>
+    <span class="nav-label">Criar Anúncio</span>
+  </button>
   <button class="nav-item" id="nav-cruzamento" onclick="switchModule('cruzamento')">
     <span class="nav-icon">🔗</span>
     <span class="nav-label">Cruzamento de Peças</span>
@@ -866,6 +923,105 @@ tr:hover td{background:#fafaf9;}
   </div>
 
 
+
+  <!-- ── MÓDULO: CRIAÇÃO DE ANÚNCIOS ── -->
+  <div class="module" id="module-listing">
+    <div class="listing-page">
+      <div class="listing-header">
+        <h2>Criação de Anúncios</h2>
+        <p>Gere títulos otimizados para cada marketplace baseados nos seus anúncios existentes</p>
+      </div>
+
+      <div class="listing-steps">
+        <!-- STEP 1 -->
+        <div class="listing-step">
+          <div class="listing-step-head">
+            <span class="listing-step-num">1</span>
+            Adicionar produtos
+          </div>
+          <div class="listing-step-body">
+            <div class="listing-form-row">
+              <div class="listing-field">
+                <label>SKU *</label>
+                <input type="text" id="lf-sku" placeholder="Ex: DS100279">
+              </div>
+              <div class="listing-field" style="grid-column:span 2">
+                <label>Categoria *</label>
+                <select id="lf-cat"><option value="">Selecione...</option></select>
+              </div>
+            </div>
+            <div class="listing-form-row">
+              <div class="listing-field"><label>Marca (Make)</label><input type="text" id="lf-make" placeholder="Ex: Honda"></div>
+              <div class="listing-field"><label>Modelo (Model)</label><input type="text" id="lf-model" placeholder="Ex: Civic"></div>
+              <div class="listing-field"><label>Motor (Engine)</label><input type="text" id="lf-engine" placeholder="Ex: 1.8L"></div>
+            </div>
+            <div class="listing-form-row">
+              <div class="listing-field"><label>Ano inicial</label><input type="text" id="lf-year-from" placeholder="2007" maxlength="4"></div>
+              <div class="listing-field"><label>Ano final</label><input type="text" id="lf-year-to" placeholder="2012" maxlength="4"></div>
+              <div class="listing-field"><label>OE Number</label><input type="text" id="lf-oe" placeholder="Ex: 38810RME..."></div>
+            </div>
+            <div class="listing-form-row">
+              <div class="listing-field"><label>Fornecedor</label><input type="text" id="lf-supplier" placeholder="Ex: GPD, UAC..."></div>
+              <div class="listing-field"><label>Preço de venda ($)</label><input type="number" id="lf-price" placeholder="89.99" step="0.01"></div>
+              <div class="listing-field"><label>Dica extra</label><input type="text" id="lf-hint" placeholder="Ex: Heavy Duty, OEM"></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:4px;">
+              <button class="listing-add-btn" onclick="addListingItem()">+ Adicionar</button>
+              <button class="listing-clear-btn" onclick="clearListingForm()">Limpar</button>
+            </div>
+            <div style="margin-top:16px;border-top:1px solid #f5f5f4;padding-top:14px;">
+              <div style="font-size:11px;color:#a8a29e;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Ou importe uma planilha</div>
+              <div class="listing-drop" id="listing-drop" onclick="document.getElementById('listing-file').click()"
+                ondragover="event.preventDefault();this.classList.add('over')"
+                ondragleave="this.classList.remove('over')"
+                ondrop="handleListingDrop(event)">
+                <div class="listing-drop-icon">📄</div>
+                <p>Clique ou arraste um arquivo .xlsx / .csv</p>
+                <small>Colunas: SKU, Categoria, Make, Model, Engine, Year From, Year To, OE, Supplier, Price</small>
+              </div>
+              <input type="file" id="listing-file" accept=".xlsx,.csv" style="display:none" onchange="handleListingFile(this)">
+              <div class="listing-file-ok" id="listing-file-ok">✓ <span id="listing-file-name"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="listing-step">
+          <div class="listing-step-head">
+            <span class="listing-step-num">2</span>
+            Produtos adicionados
+            <span style="margin-left:auto;font-size:11px;color:#a8a29e" id="listing-count">0 produtos</span>
+          </div>
+          <div class="listing-step-body" style="padding:0;max-height:380px;overflow-y:auto;">
+            <div id="listing-queue-body">
+              <div class="listing-empty">Adicione produtos no formulário ao lado</div>
+            </div>
+          </div>
+          <div style="padding:12px 18px;border-top:1px solid #f5f5f4;display:flex;gap:8px;">
+            <button class="listing-add-btn" onclick="generateAllTitles()" id="listing-gen-btn" style="flex:1" disabled>✨ Gerar títulos</button>
+            <button class="listing-clear-btn" onclick="clearAllListing()">Limpar tudo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="listing-results" id="listing-results" style="display:none">
+        <div class="listing-results-head">
+          <span>✨ Títulos gerados — edite antes de exportar</span>
+          <div class="listing-export-row">
+            <button class="listing-exp-btn" style="background:#2563eb" onclick="exportListing('eBay Stock')">⬇ eBay Stock</button>
+            <button class="listing-exp-btn" style="background:#059669" onclick="exportListing('eBay Qualy')">⬇ eBay Qualy</button>
+            <button class="listing-exp-btn" style="background:#d97706" onclick="exportListing('Amazon')">⬇ Amazon</button>
+            <button class="listing-exp-btn" style="background:#0071ce" onclick="exportListing('Walmart')">⬇ Walmart</button>
+            <button class="listing-exp-btn" style="background:#96bf48" onclick="exportListing('Shopify')">⬇ Shopify</button>
+          </div>
+        </div>
+        <div id="listing-results-body"></div>
+      </div>
+    </div>
+  </div>
+
+
   <!-- ── MÓDULO: CRUZAMENTO ── -->
   <div class="module module-cruz" id="module-cruzamento">
     <div class="app">
@@ -920,6 +1076,8 @@ function switchModule(name) {
   if(isMobile()) closeSidebar();
   if (name === 'produtos' && !produtosLoaded) {
     initProdutos();
+  } else if (name === 'listing') {
+    initListing();
   } else if (name === 'reprec') {
     if(produtosLoaded) setTimeout(buildReprec, 50);
     else initProdutos();
@@ -2433,6 +2591,279 @@ function exportReprecFile() {
   }
 
   console.log('Exported:', filename);
+}
+
+
+// ══════════════════════════════════════════════════════
+//  MÓDULO DE CRIAÇÃO DE ANÚNCIOS
+// ══════════════════════════════════════════════════════
+
+let listingQueue   = [];
+let listingResults = [];
+
+const CAT_PREFIX = {
+  'A/C Compressor':'A/C Compressor','A/C Compressor (BUS)':'A/C Compressor',
+  'A/C Condenser':'A/C Condenser','A/C Condenser HD':'A/C Condenser',
+  'A/C Evaporator':'A/C Evaporator','A/C Expansion Valve':'A/C Expansion Valve',
+  'A/C Receiver Drier':'A/C Receiver Drier','A/C Blower Motor':'A/C Blower Motor',
+  'A/C Blower Motor Resistor':'AC Blower Motor Resistor','A/C Heater Core':'A/C Heater Core',
+  'A/C Fan':'A/C Condenser Fan','A/C Kit':'A/C Kit','A/C Belt Tensioner':'A/C Belt Tensioner',
+  'Radiator':'Radiator','Radiator HD':'Radiator','Headlights':'Headlights',
+  'Fuel Pump':'Electric Fuel Pump','Control Arm':'Control Arm',
+  'Turbocharger':'OEM Turbocharger','Water Pump':'Water Pump',
+  'Motor Mount':'Engine Mount','Suspension Kit':'Suspension Kit',
+  'Suspension Kit HD':'Suspension Kit','A/C Compressor Clutch':'A/C Compressor Clutch',
+  'A/C Compressor Pulley':'A/C Compressor Pulley',
+};
+
+const MP_LIMITS  = {'eBay Stock':80,'eBay Qualy':80,'Amazon':200,'Walmart':200,'Shopify':255};
+const MP_SUFFIX  = {'eBay Stock':' QR','eBay Qualy':' QR','Amazon':'','Walmart':'','Shopify':''};
+const MP_COLORS  = {'eBay Stock':'#2563eb','eBay Qualy':'#059669','Amazon':'#d97706','Walmart':'#0071ce','Shopify':'#96bf48'};
+const ALL_MPS    = ['eBay Stock','eBay Qualy','Amazon','Walmart','Shopify'];
+
+function initListing() {
+  const cats = PI
+    ? [...new Set(Object.values(PI).map(p=>p.cat).filter(Boolean))].sort()
+    : Object.keys(CAT_PREFIX).sort();
+  const sel = document.getElementById('lf-cat');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Selecione a categoria...</option>' +
+    cats.map(c => `<option value="${c}">${c}</option>`).join('');
+}
+
+function generateTitle(item, mp) {
+  const ptype   = CAT_PREFIX[item.cat] || item.cat || 'Part';
+  const limit   = MP_LIMITS[mp]  || 80;
+  const suffix  = MP_SUFFIX[mp]  || '';
+  const yearStr = item.yearFrom && item.yearTo
+    ? (item.yearFrom===item.yearTo ? ` ${item.yearFrom}` : ` - ${item.yearFrom} to ${item.yearTo}`)
+    : item.yearFrom ? ` ${item.yearFrom}` : '';
+  const engineStr = item.engine   ? ` ${item.engine}` : '';
+  const oeStr     = item.oe       ? ` - OE# ${item.oe}` : '';
+  const hintStr   = item.hint     ? ` ${item.hint}` : '';
+  const vehicle   = [item.make, item.model].filter(Boolean).join(' ');
+
+  let title = vehicle
+    ? `New ${ptype} for ${vehicle}${engineStr}${yearStr}${oeStr}${hintStr}`
+    : `New ${ptype}${engineStr}${yearStr}${oeStr}${hintStr}`;
+
+  const maxLen = limit - suffix.length;
+  if (title.length > maxLen) title = title.slice(0, maxLen-2)+'..';
+  return title + suffix;
+}
+
+function addListingItem() {
+  const sku = (document.getElementById('lf-sku')||{}).value?.trim()||'';
+  const cat = (document.getElementById('lf-cat')||{}).value||'';
+  if (!sku||!cat) {
+    if(!sku) document.getElementById('lf-sku')?.classList.add('error');
+    if(!cat) document.getElementById('lf-cat')?.classList.add('error');
+    return;
+  }
+  document.getElementById('lf-sku')?.classList.remove('error');
+  document.getElementById('lf-cat')?.classList.remove('error');
+  listingQueue.push({
+    sku, cat,
+    make:     (document.getElementById('lf-make')||{}).value?.trim()||'',
+    model:    (document.getElementById('lf-model')||{}).value?.trim()||'',
+    engine:   (document.getElementById('lf-engine')||{}).value?.trim()||'',
+    yearFrom: (document.getElementById('lf-year-from')||{}).value?.trim()||'',
+    yearTo:   (document.getElementById('lf-year-to')||{}).value?.trim()||'',
+    oe:       (document.getElementById('lf-oe')||{}).value?.trim()||'',
+    supplier: (document.getElementById('lf-supplier')||{}).value?.trim()||'',
+    price:    parseFloat((document.getElementById('lf-price')||{}).value)||0,
+    hint:     (document.getElementById('lf-hint')||{}).value?.trim()||'',
+  });
+  clearListingForm();
+  renderListingQueue();
+}
+
+function clearListingForm() {
+  ['lf-sku','lf-make','lf-model','lf-engine','lf-year-from','lf-year-to','lf-oe','lf-supplier','lf-hint','lf-price'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  const sel=document.getElementById('lf-cat');if(sel)sel.value='';
+}
+
+function removeListingItem(idx) {
+  listingQueue.splice(idx,1);
+  renderListingQueue();
+}
+
+function renderListingQueue() {
+  const body   = document.getElementById('listing-queue-body');
+  const genBtn = document.getElementById('listing-gen-btn');
+  const cnt    = document.getElementById('listing-count');
+  if(cnt) cnt.textContent = listingQueue.length+' produto'+(listingQueue.length!==1?'s':'');
+  if(genBtn) genBtn.disabled = listingQueue.length===0;
+  if(!listingQueue.length) {
+    body.innerHTML='<div class="listing-empty">Adicione produtos no formulário ao lado</div>';
+    return;
+  }
+  body.innerHTML = listingQueue.map((item,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid #f5f5f4;">
+      <div style="flex:1;min-width:0">
+        <div style="font-family:monospace;font-size:12px;font-weight:700;color:#1d4ed8">${item.sku}</div>
+        <div style="font-size:11px;color:#78716c;margin-top:2px">${item.cat}${item.make?' · '+item.make:''}${item.model?' '+item.model:''}${item.yearFrom?' ('+item.yearFrom+(item.yearTo?'-'+item.yearTo:'')+')'  :''}</div>
+      </div>
+      ${item.price?`<span style="font-size:12px;font-weight:700;color:#1c1917">$${item.price.toFixed(2)}</span>`:''}
+      <button onclick="removeListingItem(${i})" style="background:none;border:none;color:#a8a29e;cursor:pointer;font-size:16px;padding:0 4px;">✕</button>
+    </div>`).join('');
+}
+
+function generateAllTitles() {
+  if(!listingQueue.length) return;
+  listingResults = listingQueue.map(item=>({
+    ...item,
+    titles: Object.fromEntries(ALL_MPS.map(mp=>[mp, generateTitle(item,mp)]))
+  }));
+  renderListingResults();
+  document.getElementById('listing-results').style.display='block';
+  document.getElementById('listing-results').scrollIntoView({behavior:'smooth'});
+}
+
+function renderListingResults() {
+  document.getElementById('listing-results-body').innerHTML = listingResults.map((item,idx)=>`
+    <div class="listing-item">
+      <div class="listing-item-top">
+        <span class="listing-item-sku">${item.sku}</span>
+        <span class="listing-item-cat">${item.cat}</span>
+        ${item.make?`<span style="font-size:12px;color:#57534e">${item.make} ${item.model||''}</span>`:''}
+        ${item.supplier?`<span style="font-size:11px;color:#a8a29e">· ${item.supplier}</span>`:''}
+        ${item.price?`<span class="listing-item-price">$${item.price.toFixed(2)}</span>`:''}
+      </div>
+      <div class="listing-titles">
+        ${ALL_MPS.map(mp=>{
+          const title=item.titles[mp];
+          const limit=MP_LIMITS[mp];
+          const len=title.length;
+          const cls=len>limit?'listing-char-over':len>limit*.85?'listing-char-warn':'listing-char-ok';
+          const mpKey=mp.replace(/\s+/g,'_');
+          return `<div class="listing-title-card">
+            <div class="listing-title-mp" style="color:${MP_COLORS[mp]}">${mp}</div>
+            <textarea class="listing-title-edit" id="lt-${idx}-${mpKey}"
+              oninput="updateCharCount(this,${limit},'ltc-${idx}-${mpKey}')">${title}</textarea>
+            <div class="listing-char-count ${cls}" id="ltc-${idx}-${mpKey}">${len}/${limit}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function updateCharCount(textarea,limit,countId) {
+  const len=textarea.value.length;
+  const el=document.getElementById(countId);if(!el)return;
+  el.textContent=len+'/'+limit;
+  el.className='listing-char-count '+(len>limit?'listing-char-over':len>limit*.85?'listing-char-warn':'listing-char-ok');
+}
+
+function exportListing(mp) {
+  if(typeof XLSX==='undefined'){alert('XLSX não carregado');return;}
+  if(!listingResults.length){alert('Gere os títulos primeiro.');return;}
+  const mpKey=mp.replace(/\s+/g,'_');
+  const rows=[];
+  const today=new Date().toISOString().slice(0,10);
+
+  if(mp==='eBay Stock'||mp==='eBay Qualy'){
+    // eBay file upload format (matches eBay Active Listings template)
+    rows.push(['#INFO','Version=1.0.0','Template= eBay-add-listing-US']);
+    rows.push(['Action','Category name','Title','Listing site','Currency','Start price','Available quantity','Custom label (SKU)']);
+    listingResults.forEach((item,idx)=>{
+      const t=(document.getElementById(`lt-${idx}-${mpKey}`)||{}).value||item.titles[mp];
+      rows.push(['AddItem',item.cat||'',t,'US','USD',item.price||'',10,item.sku]);
+    });
+    const wb=XLSX.utils.book_new();
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb,ws,'Listings');
+    XLSX.writeFile(wb,mpKey+'_new_listings_'+today+'.csv',{bookType:'csv'});
+
+  } else if(mp==='Amazon'){
+    // Amazon flat file inventory loader format
+    rows.push(['sku','product-id','product-id-type','price','minimum-seller-allowed-price','maximum-seller-allowed-price','item-condition','quantity','add-delete','will-ship-internationally','expedited-shipping','item-note','fulfillment-center-id','product_description','merchant_shipping_group_name','item_name']);
+    listingResults.forEach((item,idx)=>{
+      const t=(document.getElementById(`lt-${idx}-${mpKey}`)||{}).value||item.titles[mp];
+      rows.push([item.sku,'','4',item.price||'',item.price?Math.round(item.price*0.95*100)/100:'','9999.99','New',10,'a','n','n','','',t,'','',t]);
+    });
+    const wb=XLSX.utils.book_new();
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb,ws,'inventory.loader');
+    XLSX.writeFile(wb,'amazon_new_listings_'+today+'.txt',{bookType:'csv',FS:'\t'});
+
+  } else if(mp==='Walmart'){
+    // Walmart bulk upload format
+    rows.push(['SKU','Product Name','Price','Minimum Seller Allowed Price','Maximum Seller Allowed Price','Category','Brand','Condition']);
+    listingResults.forEach((item,idx)=>{
+      const t=(document.getElementById(`lt-${idx}-${mpKey}`)||{}).value||item.titles[mp];
+      rows.push([item.sku,t,item.price||'',item.price?Math.round(item.price*0.9*100)/100:'','9999.00',item.cat,item.supplier||'','New']);
+    });
+    const wb=XLSX.utils.book_new();
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb,ws,'Price');
+    XLSX.writeFile(wb,'walmart_new_listings_'+today+'.xlsx');
+
+  } else if(mp==='Shopify'){
+    // Shopify product import CSV format
+    rows.push(['Handle','Title','Body (HTML)','Vendor','Product Category','Type','Tags','Published','Variant SKU','Variant Price','Variant Compare At Price','Variant Requires Shipping','Variant Taxable','Image Src','Image Position','Image Alt Text']);
+    listingResults.forEach((item,idx)=>{
+      const t=(document.getElementById(`lt-${idx}-${mpKey}`)||{}).value||item.titles[mp];
+      const handle=item.sku.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+      rows.push([handle,t,t,item.supplier||'',item.cat,item.cat,'','true',item.sku,item.price||'','','true','true','','1',t]);
+    });
+    // Shopify SKU needs ="SKU" format
+    const wb=XLSX.utils.book_new();
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb,ws,'Products');
+    XLSX.writeFile(wb,'shopify_new_listings_'+today+'.csv',{bookType:'csv'});
+  }
+}
+
+function handleListingFile(input) {
+  const file=input.files[0];if(!file)return;
+  if(typeof XLSX==='undefined'){alert('XLSX não carregado');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const wb=XLSX.read(e.target.result,{type:'binary'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const data=XLSX.utils.sheet_to_json(ws,{defval:''});
+    const colMap={
+      sku:['sku','SKU','Sku'],cat:['categoria','Categoria','category','Category','cat'],
+      make:['make','Make','marca','Marca'],model:['model','Model','modelo','Modelo'],
+      engine:['engine','Engine','motor','Motor'],
+      yearFrom:['year from','Year From','year_from','ano inicial','Ano Inicial'],
+      yearTo:['year to','Year To','year_to','ano final','Ano Final'],
+      oe:['oe','OE','oe number','OE Number'],
+      supplier:['supplier','Supplier','fornecedor','Fornecedor'],
+      price:['price','Price'],hint:['hint','Hint','dica','extra'],
+    };
+    const get=(row,keys)=>{for(const k of keys){if(row[k]!==undefined&&row[k]!=='')return String(row[k]).trim();}return '';};
+    let added=0;
+    data.forEach(row=>{
+      const sku=get(row,colMap.sku);if(!sku)return;
+      listingQueue.push({
+        sku,cat:get(row,colMap.cat),make:get(row,colMap.make),model:get(row,colMap.model),
+        engine:get(row,colMap.engine),yearFrom:get(row,colMap.yearFrom),yearTo:get(row,colMap.yearTo),
+        oe:get(row,colMap.oe),supplier:get(row,colMap.supplier),
+        price:parseFloat(get(row,colMap.price))||0,hint:get(row,colMap.hint),
+      });added++;
+    });
+    document.getElementById('listing-file-ok').style.display='flex';
+    document.getElementById('listing-file-name').textContent=`${file.name} — ${added} produtos importados`;
+    renderListingQueue();
+  };
+  reader.readAsBinaryString(file);
+}
+
+function handleListingDrop(event) {
+  event.preventDefault();
+  document.getElementById('listing-drop').classList.remove('over');
+  const file=event.dataTransfer.files[0];
+  if(file){const input=document.getElementById('listing-file');const dt=new DataTransfer();dt.items.add(file);input.files=dt.files;handleListingFile(input);}
+}
+
+function clearAllListing() {
+  listingQueue=[];listingResults=[];
+  renderListingQueue();
+  document.getElementById('listing-results').style.display='none';
 }
 
 // ── INIT ──
