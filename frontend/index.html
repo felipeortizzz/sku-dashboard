@@ -1639,6 +1639,9 @@ tr:hover td{background:#fafaf9;}
         .ag-ic:hover{border-color:#d1d5db;}
         .ag-reason{font-size:11px;color:#a8a29e;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:270px;}
         .ag-twrap{overflow-x:auto;}
+        .loading{display:flex;align-items:center;gap:10px;padding:1rem;color:#a8a29e;font-size:13px;font-family:monospace;}
+        .spinner{width:14px;height:14px;border:2px solid #e7e5e4;border-top-color:#7c3aed;border-radius:50%;animation:spin .8s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg)}}
       </style>
 
       <!-- Search -->
@@ -1739,6 +1742,7 @@ async function initAgente() {
     document.getElementById('agic5').textContent = (s.catalogo_pausados||0).toLocaleString();
     document.getElementById('agic6').textContent = Object.keys(AGENTE.suppliers||{}).length;
     renderAgenteInsights();
+    loadSearchIndex(); // pré-carregar o índice de busca em background
   } catch(e) {
     document.getElementById('agente-answer').innerHTML = '<div style="padding:2rem;color:#a8a29e;font-size:14px;">⚠️ agente.json não encontrado. Rode o gerar_json.py primeiro.</div>';
   }
@@ -1757,24 +1761,194 @@ function agenteChip(el, mode) {
   document.getElementById('agente-answer').innerHTML = agenteRender(mode);
 }
 
+// ── SEARCH INDEX ────────────────────────────────────────────────────────────
+let SIDX = null;
+let SIDX_LOADING = false;
+
+async function loadSearchIndex() {
+  if (SIDX || SIDX_LOADING) return;
+  SIDX_LOADING = true;
+  try {
+    const resp = await fetch('data/search_index.json');
+    if (!resp.ok) throw new Error('not found');
+    SIDX = await resp.json();
+    console.log('Search index loaded:', Object.keys(SIDX).length, 'SKUs');
+  } catch(e) {
+    console.warn('search_index.json not found:', e.message);
+  }
+  SIDX_LOADING = false;
+}
+
 function agenteQuery() {
-  const q = (document.getElementById('agente-input').value || '').toLowerCase().trim();
+  const raw = (document.getElementById('agente-input').value || '').trim();
+  const q   = raw.toLowerCase();
   if (!q) return;
+
+  // Chips diretos por palavra-chave
   const map = [
-    [['top vend','mais vend','mais sold','ranking'],            'top_vendas'],
-    [['estoque zero','sem estoque','qty 0','qty=0','zerado'],   'sem_estoque'],
-    [['walmart','problem','system'],                             'walmart_prob'],
-    [['amazon','inat','inativo'],                               'amazon_inat'],
-    [['prec','alter','custo','preço'],                          'prec_alt'],
-    [['fornecedor','supplier','rn','dna','uac','pbi','gpd'],    'fornecedores'],
-    [['catálogo','catalog','pausado','cm'],                     'catalogo'],
-    [['geral','resumo','overview','tudo'],                      'overview'],
+    [['top vend','mais vend','ranking vend'],       'top_vendas'],
+    [['sem estoque','qty 0','qty=0','zerado'],      'sem_estoque'],
+    [['walmart','system_problem'],                  'walmart_prob'],
+    [['amazon inat','inativos amazon'],             'amazon_inat'],
+    [['preço alter','custo alter'],                 'prec_alt'],
+    [['fornecedor','todos sup'],                    'fornecedores'],
+    [['catálogo','catalog','cm pause'],             'catalogo'],
+    [['visão geral','resumo geral','overview'],     'overview'],
   ];
   for (const [keys, mode] of map) {
     if (keys.some(k => q.includes(k))) { agenteChip(null, mode); return; }
   }
+
+  // Busca por SKU/produto no índice
+  if (SIDX) {
+    const result = searchInIndex(raw);
+    if (result) {
+      document.getElementById('agente-insights').style.display = 'none';
+      document.getElementById('agente-answer').innerHTML = result;
+      return;
+    }
+  } else {
+    // Ainda carregando — tentar de novo em 800ms
+    loadSearchIndex().then(() => { if (SIDX) agenteQuery(); });
+    document.getElementById('agente-insights').style.display = 'none';
+    document.getElementById('agente-answer').innerHTML = `<div class="ag-block"><div class="ag-block-body"><div class="loading"><div class="spinner"></div> Carregando índice de busca...</div></div></div>`;
+    return;
+  }
+
+  // Sem resultado
   document.getElementById('agente-insights').style.display = 'none';
-  document.getElementById('agente-answer').innerHTML = `<div class="ag-block"><div class="ag-block-body"><p class="ag-intro" style="color:#a8a29e;">Nenhum resultado para "<strong style="color:#1c1917;">${q}</strong>". Tente: <em>top vendas, sem estoque, walmart, amazon, preços, fornecedores, catálogo, visão geral.</em></p></div></div>`;
+  document.getElementById('agente-answer').innerHTML = `<div class="ag-block"><div class="ag-block-body"><p class="ag-intro" style="color:#a8a29e;">Nenhum resultado para "<strong style="color:#1c1917;">${raw}</strong>".<br>Tente um SKU (ex: DS104075), nome de fornecedor (ex: RN, DNA) ou palavras como: <em>top vendas, sem estoque, walmart, amazon, preços, fornecedores.</em></p></div></div>`;
+}
+
+function searchInIndex(q) {
+  if (!SIDX) return null;
+  const KEY = q.trim().toUpperCase();
+
+  // 1. Busca exata por SKU
+  if (SIDX[KEY]) return renderSKUCard(KEY, SIDX[KEY], q);
+
+  // 2. Busca parcial — SKUs que contém o texto
+  const partials = Object.keys(SIDX).filter(k => k.includes(KEY));
+  if (partials.length === 1) return renderSKUCard(partials[0], SIDX[partials[0]], q);
+  if (partials.length > 1 && partials.length <= 30) return renderSKUList(partials, q);
+
+  // 3. Busca por descrição (palavras)
+  const words = KEY.split(/\s+/).filter(w => w.length > 2);
+  if (words.length > 0) {
+    const descMatches = Object.entries(SIDX).filter(([k, v]) =>
+      words.every(w => (v.d||'').toUpperCase().includes(w) || k.includes(w))
+    ).slice(0, 20);
+    if (descMatches.length === 1) return renderSKUCard(descMatches[0][0], descMatches[0][1], q);
+    if (descMatches.length > 1) return renderSKUList(descMatches.map(e=>e[0]), q);
+  }
+
+  return null;
+}
+
+function renderSKUList(skus, q) {
+  const rows = skus.map(sku => {
+    const v = SIDX[sku];
+    const mps = Object.keys(v.m||{});
+    const prices = Object.values(v.m||{}).map(x=>x.price).filter(Boolean);
+    const minP = prices.length ? Math.min(...prices) : 0;
+    return `<tr style="cursor:pointer" onclick="showSKUResult('${sku}')">
+      <td class="ag-sku">${sku}</td>
+      <td class="ag-title">${v.d||'—'}</td>
+      <td style="font-size:12px;color:#78716c">${v.c||'—'}</td>
+      <td class="ag-num price">${minP ? '$'+minP.toFixed(2) : '—'}</td>
+      <td style="font-size:11px;color:#78716c">${mps.join(' · ')||'—'}</td>
+    </tr>`;
+  }).join('');
+  return `<div class="ag-block">
+    <div class="ag-block-head"><span class="ag-badge info">${skus.length} resultados</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Busca: "${q}"</span></div>
+    <div class="ag-block-body">
+      <p class="ag-intro">Clique em um SKU para ver os detalhes completos.</p>
+      ${agTbl([{l:'SKU'},{l:'Produto'},{l:'Categoria'},{l:'Preço mín',r:1},{l:'Plataformas'}], rows)}
+    </div></div>`;
+}
+
+function showSKUResult(sku) {
+  if (SIDX && SIDX[sku]) {
+    document.getElementById('agente-answer').innerHTML = renderSKUCard(sku, SIDX[sku], sku);
+  }
+}
+
+function renderSKUCard(sku, v, q) {
+  const n = x => (x||0).toLocaleString();
+  const $ = x => '$'+(x||0).toFixed(2);
+  const mps = v.m || {};
+  const mpNames = {'Stock AC':'#7c3aed','Qualy Air':'#0369a1','Am. Force':'#b45309','Amazon':'#ea580c','Walmart':'#0284c7','Shopify':'#16a34a'};
+
+  // Cards de preço por marketplace
+  const mpCards = Object.entries(mps).map(([mp, d]) => {
+    const color = mpNames[mp] || '#57534e';
+    const statusBadge = d.status ? `<span class="ag-badge ${d.status==='Active'||d.status==='PUBLISHED'?'ok':'danger'}" style="font-size:10px">${d.status}</span>` : '';
+    return `<div style="background:#f5f5f4;border-radius:8px;padding:12px 14px;border-left:3px solid ${color}">
+      <div style="font-size:11px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">${mp}</div>
+      <div style="font-size:20px;font-weight:700;font-family:monospace;color:#1c1917;margin-bottom:4px">${d.price ? $(d.price) : '—'}</div>
+      <div style="font-size:11px;color:#78716c;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        ${d.qty != null ? `<span>Estoque: <strong style="color:${d.qty>0?'#16a34a':'#dc2626'}">${d.qty}</strong></span>` : ''}
+        ${d.sold != null ? `<span>Vendidos: <strong>${n(d.sold)}</strong></span>` : ''}
+        ${statusBadge}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Análise de margem
+  let marginHTML = '';
+  if (v.cost && Object.keys(mps).length > 0) {
+    const prices = Object.entries(mps).map(([mp, d]) => ({mp, price: d.price||0})).filter(x=>x.price>0);
+    const shipCost = v.ship || 0;
+    marginHTML = `<div style="margin-top:16px;">
+      <p style="font-size:11px;color:#a8a29e;text-transform:uppercase;letter-spacing:.07em;font-family:monospace;margin-bottom:8px">Análise de margem (custo: ${$(v.cost)} + frete: ${$(shipCost)})</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;">
+        ${prices.map(({mp,price}) => {
+          const total_cost = v.cost + shipCost;
+          const margin = ((price - total_cost) / price * 100);
+          const color = margin > 20 ? '#16a34a' : margin > 0 ? '#d97706' : '#dc2626';
+          const emoji = margin > 20 ? '✅' : margin > 0 ? '⚠️' : '🔴';
+          return `<div style="background:#f5f5f4;border-radius:8px;padding:10px 12px;text-align:center">
+            <div style="font-size:10px;color:#78716c;margin-bottom:4px">${mp}</div>
+            <div style="font-size:18px;font-weight:700;font-family:monospace;color:${color}">${emoji} ${margin.toFixed(1)}%</div>
+            <div style="font-size:10px;color:#a8a29e">Lucro: ${$(price-total_cost)}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  // Fornecedores equivalentes
+  let supsHTML = '';
+  if (v.sups && v.sups.length > 0) {
+    const rows = v.sups.map(s => `<tr><td style="font-family:monospace;font-size:12px;color:#7c3aed">${s.p}</td><td style="font-family:monospace;font-size:12px;color:#57534e">${s.sk}</td></tr>`).join('');
+    supsHTML = `<div style="margin-top:14px;"><p style="font-size:11px;color:#a8a29e;text-transform:uppercase;letter-spacing:.07em;font-family:monospace;margin-bottom:8px">Fornecedores / SKUs equivalentes</p>
+      ${agTbl([{l:'Parceiro'},{l:'SKU fornecedor'}], rows)}</div>`;
+  }
+
+  const statusColor = v.paused ? '#dc2626' : (v.ok ? '#16a34a' : '#78716c');
+  const statusText  = v.paused ? 'Pausado' : (v.ok ? 'Ativo' : '—');
+
+  return `<div class="ag-block">
+    <div class="ag-block-head">
+      <span class="ag-badge ${v.paused?'danger':'ok'}">${statusText}</span>
+      <span style="font-family:monospace;font-weight:700;font-size:15px;color:#1c1917">${sku}</span>
+      <span style="font-size:13px;color:#78716c;margin-left:4px">${v.c||''}</span>
+    </div>
+    <div class="ag-block-body">
+      <p style="font-size:14px;color:#1c1917;margin-bottom:14px">${v.d||'—'}</p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;font-size:13px;">
+        ${v.cost ? `<span style="background:#fef3c7;padding:4px 12px;border-radius:6px;font-family:monospace;font-weight:700;color:#92400e">Custo: ${$(v.cost)}</span>` : ''}
+        ${v.ship ? `<span style="background:#f5f5f4;padding:4px 12px;border-radius:6px;font-family:monospace;color:#57534e">Frete: ${$(v.ship)}</span>` : ''}
+        ${v.local ? `<span style="background:#f5f5f4;padding:4px 12px;border-radius:6px;font-size:12px;color:#78716c">Local: ${v.local}</span>` : ''}
+      </div>
+      <p style="font-size:11px;color:#a8a29e;text-transform:uppercase;letter-spacing:.07em;font-family:monospace;margin-bottom:10px">Preços por plataforma</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;">
+        ${mpCards || '<p style="color:#a8a29e;font-size:13px">Não encontrado nos marketplaces</p>'}
+      </div>
+      ${marginHTML}
+      ${supsHTML}
+    </div>
+  </div>`;
 }
 
 function agTbl(head, rows) {
