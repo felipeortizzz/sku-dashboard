@@ -317,3 +317,52 @@ try:
         print("  ⚠️  Base de vendas não encontrada para gerar geo.json")
 except Exception as e:
     print(f"  ⚠️  geo: {e}")
+
+# ── INVOICES ──
+print("\n  🧾 Processando invoices...")
+inv_names = ['resultado.xlsx', 'invoices.xlsx', 'Invoices.xlsx', 'INVOICES.xlsx']
+inv_file = next((INPUT/n for n in inv_names if (INPUT/n).exists()), None)
+
+if not inv_file:
+    print(f"  ⚠️  Invoices: nenhum arquivo encontrado em data/input/")
+    print(f"       Nomes aceitos: {', '.join(inv_names)}")
+else:
+    print(f"     Lendo {inv_file.name}...")
+    try:
+        # Parse Resumo
+        df_inv = pd.read_excel(inv_file, sheet_name='Resumo', header=2)
+        df_inv.columns = df_inv.iloc[0]
+        df_inv = df_inv.iloc[1:].reset_index(drop=True)
+        df_inv.columns = ['pasta','invoice','po','data_inv','vencimento','fornecedor','cobrar_para','enviar_para','cond_pgto','transportadora','data_envio','rastreamento','vendedor','subtotal','desconto','imposto','total','pgto','saldo','moeda']
+        df_inv = df_inv[df_inv['pasta'] != 'TOTAL GERAL'].copy()
+        for col in ['subtotal','desconto','imposto','total','pgto','saldo']:
+            df_inv[col] = pd.to_numeric(df_inv[col], errors='coerce').fillna(0)
+
+        # Parse Itens
+        df_it = pd.read_excel(inv_file, sheet_name='Itens', header=2)
+        df_it.columns = df_it.iloc[0]
+        df_it = df_it.iloc[1:].reset_index(drop=True)
+        df_it.columns = ['pasta','invoice','po','data_inv','fornecedor','cod_item','descricao','qtd','preco_unit','valor_total']
+        for col in ['qtd','preco_unit','valor_total']:
+            df_it[col] = pd.to_numeric(df_it[col], errors='coerce').fillna(0)
+
+        invoices = []
+        for _, r in df_inv.iterrows():
+            inv_num = str(r['invoice']).strip()
+            items = df_it[df_it['invoice'].astype(str).str.strip() == inv_num]
+            item_list = [{'cod':str(it['cod_item']),'desc':str(it['descricao'])[:60],'qtd':int(it['qtd']),'unit':round(float(it['preco_unit']),2),'total':round(float(it['valor_total']),2)} for _,it in items.iterrows()]
+            invoices.append({
+                'supplier':str(r['pasta']),'invoice':inv_num,'po':str(r['po']),
+                'data':str(r['data_inv'])[:10],'venc':str(r['vencimento'])[:10],
+                'fornecedor':str(r['fornecedor']),'enviar':str(r['enviar_para'])[:60],
+                'cond':str(r['cond_pgto']),'vendedor':str(r['vendedor']),
+                'subtotal':round(float(r['subtotal']),2),'desconto':round(float(r['desconto']),2),
+                'imposto':round(float(r['imposto']),2),'total':round(float(r['total']),2),
+                'pgto':round(float(r['pgto']),2),'saldo':round(float(r['saldo']),2),
+                'moeda':str(r['moeda']),'items':item_list,
+            })
+
+        save({'invoices': invoices}, OUTPUT / 'invoices.json')
+        print(f"     {len(invoices)} invoices processadas")
+    except Exception as e:
+        print(f"  ⚠️  Erro ao processar invoices: {e}")

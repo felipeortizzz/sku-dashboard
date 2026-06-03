@@ -720,6 +720,72 @@ tr:hover td{background:#fafaf9;}
   .ship-page{padding:14px 12px!important;}
 }
 
+
+/* ══════════════════════════════
+   INVOICES
+══════════════════════════════ */
+.inv-page{max-width:1200px;margin:0 auto;padding:24px 20px;}
+.inv-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.inv-header h2{font-size:22px;font-weight:800;color:#1c1917;margin-bottom:2px;}
+.inv-header p{font-size:13px;color:#78716c;}
+
+.inv-kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;}
+.inv-kpi{background:#fff;border:1px solid #e7e5e4;border-radius:10px;padding:16px 18px;position:relative;overflow:hidden;}
+.inv-kpi-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:10px 10px 0 0;}
+.inv-kpi-num{font-size:22px;font-weight:800;line-height:1.1;margin-bottom:4px;}
+.inv-kpi-lbl{font-size:11px;color:#78716c;font-weight:500;}
+.inv-kpi-sub{font-size:10px;color:#a8a29e;margin-top:3px;}
+
+.inv-charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.inv-card{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;}
+.inv-card-head{padding:12px 16px;font-size:13px;font-weight:700;border-bottom:1px solid #f5f5f4;}
+.inv-card-body{padding:12px 16px;}
+
+.inv-sup-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f4;}
+.inv-sup-row:last-child{border-bottom:none;}
+.inv-sup-name{font-size:12px;font-weight:700;color:#1c1917;width:90px;flex-shrink:0;}
+.inv-sup-bar-wrap{flex:1;height:8px;background:#f0efee;border-radius:4px;overflow:hidden;}
+.inv-sup-bar{height:100%;border-radius:4px;background:#1c1917;}
+.inv-sup-val{font-size:11px;font-weight:700;color:#1c1917;width:80px;text-align:right;flex-shrink:0;}
+.inv-sup-saldo{font-size:10px;color:#ef4444;width:70px;text-align:right;flex-shrink:0;}
+
+.inv-filters{background:#fff;border:1px solid #e7e5e4;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+.inv-filter-group{display:flex;flex-direction:column;gap:3px;}
+.inv-filter-group label{font-size:10px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.04em;}
+.inv-filter-group select,.inv-filter-group input{padding:7px 10px;border:1px solid #e7e5e4;border-radius:7px;font-size:12px;color:#1c1917;background:#fff;outline:none;min-width:140px;}
+.inv-apply-btn{background:#1c1917;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;align-self:flex-end;}
+.inv-clear-btn{background:#fff;color:#57534e;border:1px solid #e7e5e4;border-radius:7px;padding:7px 10px;font-size:12px;cursor:pointer;align-self:flex-end;}
+
+.inv-table-card{background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;}
+.inv-table-info{padding:10px 16px;font-size:12px;color:#78716c;background:#fafaf9;border-bottom:1px solid #f0efee;display:flex;justify-content:space-between;align-items:center;}
+.inv-table{width:100%;border-collapse:collapse;font-size:12px;}
+.inv-table th{text-align:left;padding:8px 12px;font-size:10px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.04em;background:#fafaf9;border-bottom:1px solid #f0efee;white-space:nowrap;}
+.inv-table td{padding:9px 12px;border-bottom:1px solid #f5f5f4;vertical-align:middle;}
+.inv-table tr:hover td{background:#fafaf9;cursor:pointer;}
+.inv-table tr.expanded td{background:#f0f9ff;}
+
+.inv-saldo-ok{color:#22c55e;font-weight:700;}
+.inv-saldo-pend{color:#ef4444;font-weight:700;}
+.inv-sup-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#f5f5f4;color:#57534e;}
+
+/* Items detail */
+.inv-items-row{display:none;background:#f8faff;}
+.inv-items-row.open{display:table-row;}
+.inv-items-wrap{padding:10px 16px;}
+.inv-items-table{width:100%;border-collapse:collapse;font-size:11px;}
+.inv-items-table th{text-align:left;padding:5px 8px;font-size:10px;font-weight:700;color:#a8a29e;border-bottom:1px solid #e7e5e4;}
+.inv-items-table td{padding:6px 8px;border-bottom:1px solid #f5f5f4;}
+
+.inv-pg-wrap{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #f0efee;}
+.inv-pg-btn{background:#fff;border:1px solid #e7e5e4;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;color:#57534e;}
+.inv-pg-btn:hover:not(:disabled){background:#f5f5f4;}
+.inv-pg-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+@media(max-width:768px){
+  .inv-kpi-grid{grid-template-columns:repeat(2,1fr)!important;}
+  .inv-charts{grid-template-columns:1fr!important;}
+}
+
 </style>
 </head>
 <body>
@@ -803,6 +869,10 @@ tr:hover td{background:#fafaf9;}
   <button class="nav-item" id="nav-listing" onclick="switchModule('listing')">
     <span class="nav-icon">📝</span>
     <span class="nav-label">Criar Anúncio</span>
+  </button>
+  <button class="nav-item" id="nav-invoices" onclick="switchModule('invoices')">
+    <span class="nav-icon">🧾</span>
+    <span class="nav-label">Invoices</span>
   </button>
   <button class="nav-item" id="nav-cruzamento" onclick="switchModule('cruzamento')">
     <span class="nav-icon">🔗</span>
@@ -1388,6 +1458,96 @@ tr:hover td{background:#fafaf9;}
   </div>
 
 
+
+  <!-- ── MÓDULO: INVOICES ── -->
+  <div class="module" id="module-invoices">
+    <div class="inv-page">
+      <div class="inv-header">
+        <div>
+          <h2>🧾 Invoices de Fornecedores</h2>
+          <p>Controle de notas fiscais, pagamentos e saldos por fornecedor</p>
+        </div>
+        <button class="inv-apply-btn" onclick="exportInvoices()">⬇ Exportar Excel</button>
+      </div>
+
+      <div class="inv-kpi-grid" id="inv-kpis"></div>
+
+      <div class="inv-charts">
+        <div class="inv-card">
+          <div class="inv-card-head">💰 Total por fornecedor</div>
+          <div class="inv-card-body" id="inv-sup-chart"></div>
+        </div>
+        <div class="inv-card">
+          <div class="inv-card-head">⏳ Saldo devedor por fornecedor</div>
+          <div class="inv-card-body" id="inv-saldo-chart"></div>
+        </div>
+      </div>
+
+      <div class="inv-filters">
+        <div class="inv-filter-group">
+          <label>Fornecedor</label>
+          <select id="inv-f-sup" onchange="applyInvFilters()"><option value="">Todos</option></select>
+        </div>
+        <div class="inv-filter-group">
+          <label>Status pagamento</label>
+          <select id="inv-f-status" onchange="applyInvFilters()">
+            <option value="">Todos</option>
+            <option value="pago">Pago</option>
+            <option value="pendente">Pendente</option>
+            <option value="parcial">Parcial</option>
+          </select>
+        </div>
+        <div class="inv-filter-group">
+          <label>Data início</label>
+          <input type="date" id="inv-f-from" onchange="applyInvFilters()">
+        </div>
+        <div class="inv-filter-group">
+          <label>Data fim</label>
+          <input type="date" id="inv-f-to" onchange="applyInvFilters()">
+        </div>
+        <div class="inv-filter-group">
+          <label>Buscar invoice / PO</label>
+          <input type="text" id="inv-f-q" placeholder="Invoice # ou PO..." oninput="applyInvFilters()">
+        </div>
+        <button class="inv-clear-btn" onclick="clearInvFilters()">✕</button>
+      </div>
+
+      <div class="inv-table-card">
+        <div class="inv-table-info">
+          <span id="inv-table-info">—</span>
+          <span id="inv-pg-info" style="font-size:11px;color:#a8a29e"></span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th style="width:30px"></th>
+                <th>Fornecedor</th>
+                <th>Invoice #</th>
+                <th>PO Number</th>
+                <th>Data</th>
+                <th>Vencimento</th>
+                <th>Enviar Para</th>
+                <th style="text-align:right">Subtotal</th>
+                <th style="text-align:right">Total</th>
+                <th style="text-align:right">Pgto</th>
+                <th style="text-align:right">Saldo</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="inv-tbody"></tbody>
+          </table>
+        </div>
+        <div class="inv-pg-wrap">
+          <button class="inv-pg-btn" id="inv-pg-prev" onclick="invGoPage(-1)">‹ Anterior</button>
+          <span id="inv-pg-lbl" style="font-size:12px;color:#78716c"></span>
+          <button class="inv-pg-btn" id="inv-pg-next" onclick="invGoPage(1)">Próxima ›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <!-- ── MÓDULO: CRUZAMENTO ── -->
   <div class="module module-cruz" id="module-cruzamento">
     <div class="app">
@@ -1442,6 +1602,8 @@ function switchModule(name) {
   if(isMobile()) closeSidebar();
   if (name === 'produtos' && !produtosLoaded) {
     initProdutos();
+  } else if (name === 'invoices') {
+    initInvoices();
   } else if (name === 'listing') {
     initListing();
   } else if (name === 'tracking') {
@@ -3751,6 +3913,248 @@ function getSalesForSku(sku) {
   return `<span class="tag" style="background:${color}10;color:${color};border:1px solid ${color}30">
     📦 ${qty} vendas (90d)
   </span>`;
+}
+
+
+// ══════════════════════════════════════════════════════
+//  MÓDULO DE INVOICES
+// ══════════════════════════════════════════════════════
+let INV_DATA = null;
+let invFiltered = [];
+let invPage = 0;
+const INV_PAGE = 50;
+let invOpenRow = null;
+
+async function initInvoices() {
+  if (INV_DATA) { buildInvDash(); return; }
+  document.getElementById('inv-kpis').innerHTML = '<div style="grid-column:span 5;padding:20px;text-align:center;color:#a8a29e">Carregando...</div>';
+  try {
+    INV_DATA = await fetchData('data/invoices.json');
+    buildInvDash();
+  } catch(e) {
+    document.getElementById('inv-kpis').innerHTML = '<div style="grid-column:span 5;padding:20px;text-align:center;color:#ef4444">Erro: '+e.message+'</div>';
+  }
+}
+
+function buildInvDash() {
+  const rows = INV_DATA.invoices;
+  // Populate filters
+  const sups = [...new Set(rows.map(r=>r.supplier))].sort();
+  const dates = rows.map(r=>r.data).filter(Boolean).sort();
+  document.getElementById('inv-f-sup').innerHTML = '<option value="">Todos</option>' + sups.map(s=>`<option>${s}</option>`).join('');
+  if(dates[0]) document.getElementById('inv-f-from').value = dates[0].replace(/\/|\.(?=\d{2}$)/g,'-').split('/').reverse().join('-');
+  if(dates[dates.length-1]) document.getElementById('inv-f-to').value = dates[dates.length-1].replace(/\/|\.(?=\d{2}$)/g,'-').split('/').reverse().join('-');
+  applyInvFilters();
+}
+
+function parseDate(s) {
+  if(!s) return '';
+  // handles DD/MM/YYYY or YYYY-MM-DD
+  if(s.includes('/')) { const [d,m,y]=s.split('/'); return `${y}-${m}-${d}`; }
+  return s.slice(0,10);
+}
+
+function applyInvFilters() {
+  const rows = INV_DATA?.invoices || [];
+  const sup    = (document.getElementById('inv-f-sup')||{}).value||'';
+  const status = (document.getElementById('inv-f-status')||{}).value||'';
+  const from   = (document.getElementById('inv-f-from')||{}).value||'';
+  const to     = (document.getElementById('inv-f-to')||{}).value||'';
+  const q      = ((document.getElementById('inv-f-q')||{}).value||'').toLowerCase();
+
+  invFiltered = rows.filter(r => {
+    if(sup && r.supplier !== sup) return false;
+    const invStatus = r.saldo <= 0 ? 'pago' : r.pgto > 0 ? 'parcial' : 'pendente';
+    if(status && invStatus !== status) return false;
+    const d = parseDate(r.data);
+    if(from && d < from) return false;
+    if(to   && d > to)   return false;
+    if(q && !r.invoice.toLowerCase().includes(q) && !r.po.toLowerCase().includes(q) && !r.enviar.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  invPage = 0;
+  invOpenRow = null;
+  renderInvKPIs();
+  renderInvCharts();
+  renderInvTable();
+}
+
+function clearInvFilters() {
+  ['inv-f-sup','inv-f-status','inv-f-from','inv-f-to','inv-f-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  applyInvFilters();
+}
+
+function renderInvKPIs() {
+  const rows = invFiltered;
+  const total   = rows.reduce((s,r)=>s+r.total,0);
+  const saldo   = rows.reduce((s,r)=>s+r.saldo,0);
+  const pgto    = rows.reduce((s,r)=>s+r.pgto,0);
+  const nPend   = rows.filter(r=>r.saldo>0).length;
+  const nPago   = rows.filter(r=>r.saldo<=0).length;
+
+  document.getElementById('inv-kpis').innerHTML = `
+    <div class="inv-kpi"><div class="inv-kpi-accent" style="background:#3b82f6"></div>
+      <div class="inv-kpi-num" style="color:#3b82f6">${rows.length}</div>
+      <div class="inv-kpi-lbl">Total de invoices</div>
+    </div>
+    <div class="inv-kpi"><div class="inv-kpi-accent" style="background:#1c1917"></div>
+      <div class="inv-kpi-num">$${total.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      <div class="inv-kpi-lbl">Valor total</div>
+    </div>
+    <div class="inv-kpi"><div class="inv-kpi-accent" style="background:#22c55e"></div>
+      <div class="inv-kpi-num" style="color:#22c55e">$${pgto.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      <div class="inv-kpi-lbl">Total pago</div>
+      <div class="inv-kpi-sub">${nPago} invoices quitadas</div>
+    </div>
+    <div class="inv-kpi"><div class="inv-kpi-accent" style="background:#ef4444"></div>
+      <div class="inv-kpi-num" style="color:#ef4444">$${saldo.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      <div class="inv-kpi-lbl">Saldo devedor</div>
+      <div class="inv-kpi-sub">${nPend} invoices pendentes</div>
+    </div>
+    <div class="inv-kpi"><div class="inv-kpi-accent" style="background:#f59e0b"></div>
+      <div class="inv-kpi-num" style="color:#f59e0b">${total>0?(saldo/total*100).toFixed(1):0}%</div>
+      <div class="inv-kpi-lbl">% pendente do total</div>
+    </div>
+  `;
+}
+
+function renderInvCharts() {
+  const rows = invFiltered;
+  // By supplier - total
+  const bySupTotal = {}, bySupSaldo = {};
+  rows.forEach(r => {
+    bySupTotal[r.supplier] = (bySupTotal[r.supplier]||0) + r.total;
+    bySupSaldo[r.supplier] = (bySupSaldo[r.supplier]||0) + r.saldo;
+  });
+
+  const maxTotal = Math.max(...Object.values(bySupTotal),1);
+  const maxSaldo = Math.max(...Object.values(bySupSaldo).filter(v=>v>0),1);
+
+  document.getElementById('inv-sup-chart').innerHTML = Object.entries(bySupTotal)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([sup,val])=>`
+      <div class="inv-sup-row">
+        <span class="inv-sup-name">${sup}</span>
+        <div class="inv-sup-bar-wrap"><div class="inv-sup-bar" style="width:${(val/maxTotal*100).toFixed(1)}%"></div></div>
+        <span class="inv-sup-val">$${(val/1000).toFixed(1)}k</span>
+      </div>`).join('');
+
+  document.getElementById('inv-saldo-chart').innerHTML = Object.entries(bySupSaldo)
+    .filter(([,v])=>v>0)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([sup,val])=>`
+      <div class="inv-sup-row">
+        <span class="inv-sup-name">${sup}</span>
+        <div class="inv-sup-bar-wrap"><div class="inv-sup-bar" style="width:${(val/maxSaldo*100).toFixed(1)}%;background:#ef4444"></div></div>
+        <span class="inv-sup-saldo">$${val.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+      </div>`).join('') || '<div style="padding:10px;font-size:13px;color:#22c55e">✓ Sem saldo devedor</div>';
+}
+
+function renderInvTable() {
+  const rows = invFiltered;
+  const pages = Math.ceil(rows.length / INV_PAGE);
+  const page  = rows.slice(invPage*INV_PAGE, (invPage+1)*INV_PAGE);
+
+  document.getElementById('inv-table-info').textContent = rows.length.toLocaleString()+' invoices · Total: $'+rows.reduce((s,r)=>s+r.total,0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' · Saldo: $'+rows.reduce((s,r)=>s+r.saldo,0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('inv-pg-info').textContent = `Página ${invPage+1} de ${pages}`;
+  document.getElementById('inv-pg-lbl').textContent  = `${invPage+1} / ${pages}`;
+  document.getElementById('inv-pg-prev').disabled = invPage===0;
+  document.getElementById('inv-pg-next').disabled = invPage>=pages-1;
+
+  document.getElementById('inv-tbody').innerHTML = page.map((r,i)=>{
+    const idx   = invPage*INV_PAGE + i;
+    const isPago = r.saldo <= 0;
+    const isParcial = r.pgto > 0 && r.saldo > 0;
+    const statusBadge = isPago
+      ? '<span style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700">✓ Pago</span>'
+      : isParcial
+      ? '<span style="background:#fffbeb;color:#b45309;border:1px solid #fde68a;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700">⟳ Parcial</span>'
+      : '<span style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700">⏳ Pendente</span>';
+
+    const itemsHtml = r.items.length ? `
+      <tr class="inv-items-row" id="inv-items-${idx}">
+        <td colspan="12" style="padding:0;background:#f8faff;border-bottom:1px solid #e7e5e4">
+          <div style="padding:10px 16px">
+            <table class="inv-items-table">
+              <thead><tr>
+                <th>Cód. Item</th><th>Descrição</th>
+                <th style="text-align:right">Qtd</th>
+                <th style="text-align:right">Preço Unit.</th>
+                <th style="text-align:right">Total</th>
+              </tr></thead>
+              <tbody>
+                ${r.items.map(it=>`<tr>
+                  <td style="font-family:monospace;font-size:10px;font-weight:700;color:#1d4ed8">${it.cod}</td>
+                  <td>${it.desc}</td>
+                  <td style="text-align:right">${it.qtd}</td>
+                  <td style="text-align:right">$${it.unit.toFixed(2)}</td>
+                  <td style="text-align:right;font-weight:700">$${it.total.toFixed(2)}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </td>
+      </tr>` : '';
+
+    return `<tr onclick="toggleInvItems(${idx})" style="cursor:pointer">
+      <td style="text-align:center;color:#a8a29e;font-size:11px">${r.items.length?'▶':''}</td>
+      <td><span class="inv-sup-badge">${r.supplier}</span></td>
+      <td style="font-family:monospace;font-size:11px;font-weight:700;color:#1d4ed8">${r.invoice}</td>
+      <td style="font-size:11px;color:#57534e">${r.po}</td>
+      <td style="font-size:11px">${r.data}</td>
+      <td style="font-size:11px;color:${r.saldo>0?'#ef4444':'#78716c'}">${r.venc}</td>
+      <td style="font-size:11px;color:#78716c;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.enviar}">${r.enviar.slice(0,30)}</td>
+      <td style="text-align:right;font-size:12px">$${r.subtotal.toFixed(2)}</td>
+      <td style="text-align:right;font-size:12px;font-weight:700">$${r.total.toFixed(2)}</td>
+      <td style="text-align:right;font-size:12px;color:#22c55e">$${r.pgto.toFixed(2)}</td>
+      <td style="text-align:right;font-size:12px" class="${r.saldo>0?'inv-saldo-pend':'inv-saldo-ok'}">$${r.saldo.toFixed(2)}</td>
+      <td>${statusBadge}</td>
+    </tr>${itemsHtml}`;
+  }).join('');
+}
+
+function toggleInvItems(idx) {
+  const row = document.getElementById('inv-items-'+idx);
+  if(!row) return;
+  const isOpen = row.classList.contains('open');
+  if(invOpenRow && invOpenRow !== row) invOpenRow.classList.remove('open');
+  row.classList.toggle('open', !isOpen);
+  invOpenRow = isOpen ? null : row;
+  // Update arrow
+  const trs = document.querySelectorAll('#inv-tbody tr:not(.inv-items-row)');
+  trs.forEach((tr,i)=>{ const td=tr.querySelector('td:first-child'); if(td&&i===idx%INV_PAGE) td.textContent=isOpen?'▶':'▼'; });
+}
+
+function invGoPage(dir) {
+  const pages = Math.ceil(invFiltered.length/INV_PAGE);
+  invPage = Math.max(0, Math.min(pages-1, invPage+dir));
+  invOpenRow = null;
+  renderInvTable();
+  document.getElementById('module-invoices').scrollTop=0;
+}
+
+function exportInvoices() {
+  if(typeof XLSX==='undefined'){alert('XLSX não carregado');return;}
+  if(!invFiltered.length){alert('Nenhum dado para exportar.');return;}
+  const header = ['Fornecedor','Invoice #','PO Number','Data Invoice','Vencimento','Enviar Para','Condição Pgto','Vendedor','Subtotal','Desconto','Imposto','Total','Pgto Aplicado','Saldo Devedor','Moeda','Status'];
+  const data = [header, ...invFiltered.map(r=>{
+    const s = r.saldo<=0?'Pago':r.pgto>0?'Parcial':'Pendente';
+    return [r.supplier,r.invoice,r.po,r.data,r.venc,r.enviar,r.cond,r.vendedor,r.subtotal,r.desconto,r.imposto,r.total,r.pgto,r.saldo,r.moeda,s];
+  })];
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  ws['!cols']=[{wch:10},{wch:10},{wch:16},{wch:12},{wch:12},{wch:30},{wch:18},{wch:16},{wch:10},{wch:10},{wch:10},{wch:10},{wch:12},{wch:12},{wch:6},{wch:10}];
+  XLSX.utils.book_append_sheet(wb,ws,'Invoices');
+
+  // Items sheet
+  const hItems=['Fornecedor','Invoice #','PO','Data','Cód Item','Descrição','Qtd','Preço Unit','Total'];
+  const dItems=[hItems];
+  invFiltered.forEach(r=>r.items.forEach(it=>dItems.push([r.supplier,r.invoice,r.po,r.data,it.cod,it.desc,it.qtd,it.unit,it.total])));
+  const ws2=XLSX.utils.aoa_to_sheet(dItems);
+  XLSX.utils.book_append_sheet(wb,ws2,'Itens');
+
+  XLSX.writeFile(wb,'invoices_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
 
 // ── INIT ──
