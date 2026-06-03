@@ -878,6 +878,10 @@ tr:hover td{background:#fafaf9;}
     <span class="nav-icon">🔗</span>
     <span class="nav-label">Cruzamento de Peças</span>
   </button>
+  <button class="nav-item" id="nav-agente" onclick="switchModule('agente')">
+    <span class="nav-icon">🤖</span>
+    <span class="nav-label">Agente</span>
+  </button>
   <div class="sidebar-footer">v2.0 · Qualy Air</div>
 </div>
 
@@ -1587,9 +1591,257 @@ tr:hover td{background:#fafaf9;}
 </div>
   </div>
 
+  <!-- ── MÓDULO: AGENTE ── -->
+  <div class="module" id="module-agente">
+    <div id="agente-root" style="max-width:960px;margin:0 auto;padding:2rem 1.5rem 4rem;">
+
+      <!-- Header -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:2rem;">
+        <div id="agente-dot" style="width:10px;height:10px;border-radius:50%;background:#4f7cff;box-shadow:0 0 10px #4f7cff;animation:agentePulse 2s ease-in-out infinite;"></div>
+        <div style="font-size:13px;color:#78716c;letter-spacing:0.07em;text-transform:uppercase;font-family:monospace;">Qualy Air · <strong style="color:#1c1917;">Agente de Operações</strong></div>
+      </div>
+      <style>
+        @keyframes agentePulse{0%,100%{opacity:1}50%{opacity:.35}}
+        .ag-chip{padding:6px 14px;border-radius:999px;border:1px solid #e7e5e4;font-size:12px;color:#78716c;cursor:pointer;background:transparent;transition:all .15s;white-space:nowrap;}
+        .ag-chip:hover,.ag-chip.ag-active{border-color:#4f7cff;color:#4f7cff;background:rgba(79,124,255,.07);}
+        .ag-stat{background:#f5f5f4;border-radius:10px;padding:14px 16px;}
+        .ag-stat .ag-lbl{font-size:11px;color:#a8a29e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;font-family:monospace;}
+        .ag-stat .ag-val{font-size:22px;font-weight:700;color:#1c1917;font-family:monospace;}
+        .ag-stat .ag-sub{font-size:11px;color:#a8a29e;margin-top:2px;}
+        .ag-block{background:#fff;border:1px solid #e7e5e4;border-radius:12px;margin-bottom:1.5rem;overflow:hidden;animation:agFadeIn .2s ease;}
+        @keyframes agFadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+        .ag-block-head{padding:13px 18px;border-bottom:1px solid #f5f5f4;display:flex;align-items:center;gap:10px;}
+        .ag-block-body{padding:18px;}
+        .ag-intro{font-size:14px;color:#78716c;margin-bottom:14px;line-height:1.6;}
+        .ag-intro strong{color:#1c1917;}
+        .ag-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+        .ag-tbl th{text-align:left;padding:7px 12px;font-size:10px;color:#a8a29e;text-transform:uppercase;letter-spacing:.07em;font-family:monospace;border-bottom:1px solid #f5f5f4;font-weight:500;}
+        .ag-tbl td{padding:8px 12px;border-bottom:1px solid #f5f5f4;color:#78716c;vertical-align:middle;}
+        .ag-tbl tr:last-child td{border-bottom:none;}
+        .ag-tbl tr:hover td{background:#fafaf9;}
+        .ag-sku{font-family:monospace;font-size:12px;color:#7c3aed;font-weight:600;}
+        .ag-title{color:#1c1917;max-width:310px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        .ag-num{font-family:monospace;text-align:right;}
+        .ag-num.sold{color:#16a34a;}
+        .ag-num.price{color:#1c1917;}
+        .ag-num.qok{color:#16a34a;}
+        .ag-num.qzero{color:#dc2626;}
+        .ag-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-family:monospace;font-weight:600;}
+        .ag-badge.ok{background:#dcfce7;color:#15803d;}
+        .ag-badge.warn{background:#fef3c7;color:#92400e;}
+        .ag-badge.danger{background:#fee2e2;color:#b91c1c;}
+        .ag-badge.info{background:#ede9fe;color:#6d28d9;}
+        .ag-alert{border-left:3px solid;border-radius:0 8px 8px 0;padding:11px 15px;font-size:13px;line-height:1.6;margin-bottom:10px;}
+        .ag-alert.warn{border-color:#f59e0b;background:#fffbeb;color:#1c1917;}
+        .ag-alert.danger{border-color:#ef4444;background:#fef2f2;color:#1c1917;}
+        .ag-alert.ok{border-color:#22c55e;background:#f0fdf4;color:#1c1917;}
+        .ag-ic{background:#fff;border:1px solid #e7e5e4;border-radius:10px;padding:16px;cursor:pointer;transition:border-color .15s;}
+        .ag-ic:hover{border-color:#d1d5db;}
+        .ag-reason{font-size:11px;color:#a8a29e;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:270px;}
+        .ag-twrap{overflow-x:auto;}
+      </style>
+
+      <!-- Search -->
+      <div style="position:relative;margin-bottom:1.25rem;">
+        <input id="agente-input" type="text" placeholder="Pergunte sobre vendas, estoque, preços, alertas…"
+          style="width:100%;padding:14px 110px 14px 18px;background:#fff;border:1px solid #e7e5e4;border-radius:12px;font-size:15px;outline:none;color:#1c1917;transition:border-color .2s;"
+          onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#e7e5e4'"
+          onkeydown="if(event.key==='Enter')agenteQuery()" />
+        <button onclick="agenteQuery()"
+          style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#1c1917;border:none;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600;">
+          Buscar
+        </button>
+      </div>
+
+      <!-- Chips -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem;" id="agente-chips">
+        <button class="ag-chip" onclick="agenteChip(this,'top_vendas')">🏆 Top vendas eBay</button>
+        <button class="ag-chip" onclick="agenteChip(this,'sem_estoque')">⚠️ Sem estoque</button>
+        <button class="ag-chip" onclick="agenteChip(this,'walmart_prob')">🛒 Problemas Walmart</button>
+        <button class="ag-chip" onclick="agenteChip(this,'amazon_inat')">📦 Inativos Amazon</button>
+        <button class="ag-chip" onclick="agenteChip(this,'prec_alt')">💰 Preços alterados</button>
+        <button class="ag-chip" onclick="agenteChip(this,'overview')">📊 Visão geral</button>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:2rem;" id="agente-stats">
+        <div class="ag-stat"><div class="ag-lbl">eBay ativos</div><div class="ag-val" id="ags1">—</div><div class="ag-sub">listagens</div></div>
+        <div class="ag-stat"><div class="ag-lbl">Sem estoque</div><div class="ag-val" id="ags2" style="color:#dc2626;">—</div><div class="ag-sub">ainda ativos</div></div>
+        <div class="ag-stat"><div class="ag-lbl">Amazon ativos</div><div class="ag-val" id="ags3" style="color:#16a34a;">—</div><div class="ag-sub">listagens</div></div>
+        <div class="ag-stat"><div class="ag-lbl">Walmart problemas</div><div class="ag-val" id="ags4" style="color:#d97706;">—</div><div class="ag-sub">ação necessária</div></div>
+      </div>
+
+      <!-- Insights cards (default view) -->
+      <div id="agente-insights">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#a8a29e;font-family:monospace;margin-bottom:10px;">alertas e insights</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="ag-ic" onclick="agenteChip(null,'sem_estoque')">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;"><div style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0;"></div><div style="font-size:12px;color:#78716c;font-family:monospace;">eBay · sem estoque</div></div>
+            <div style="font-size:26px;font-weight:700;font-family:monospace;color:#ef4444;line-height:1;margin-bottom:4px;" id="agic1">—</div>
+            <div style="font-size:12px;color:#a8a29e;line-height:1.5;">SKUs com qty=0 ainda listados. Risco de venda sem fulfillment.</div>
+          </div>
+          <div class="ag-ic" onclick="agenteChip(null,'walmart_prob')">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;"><div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></div><div style="font-size:12px;color:#78716c;font-family:monospace;">Walmart · problema</div></div>
+            <div style="font-size:26px;font-weight:700;font-family:monospace;color:#f59e0b;line-height:1;margin-bottom:4px;" id="agic2">—</div>
+            <div style="font-size:12px;color:#a8a29e;line-height:1.5;">Listagens com SYSTEM_PROBLEM — imagem ou dados insuficientes.</div>
+          </div>
+          <div class="ag-ic" onclick="agenteChip(null,'amazon_inat')">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;"><div style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0;"></div><div style="font-size:12px;color:#78716c;font-family:monospace;">Amazon · inativos</div></div>
+            <div style="font-size:26px;font-weight:700;font-family:monospace;color:#ef4444;line-height:1;margin-bottom:4px;" id="agic3">—</div>
+            <div style="font-size:12px;color:#a8a29e;line-height:1.5;">Listagens inativas. Podem estar perdendo vendas agora.</div>
+          </div>
+          <div class="ag-ic" onclick="agenteChip(null,'prec_alt')">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;"><div style="width:8px;height:8px;border-radius:50%;background:#7c3aed;flex-shrink:0;"></div><div style="font-size:12px;color:#78716c;font-family:monospace;">Preços · atualizados</div></div>
+            <div style="font-size:26px;font-weight:700;font-family:monospace;color:#7c3aed;line-height:1;margin-bottom:4px;" id="agic4">—</div>
+            <div style="font-size:12px;color:#a8a29e;line-height:1.5;">Preços alterados recentemente na planilha de precificação.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Answer area -->
+      <div id="agente-answer"></div>
+
+    </div>
+  </div>
+
 </div><!-- /main -->
 
 <script>
+
+// ── MÓDULO: AGENTE ──
+let AGENTE = null;
+
+async function initAgente() {
+  if (AGENTE) { renderAgenteInsights(); return; }
+  try {
+    AGENTE = await fetchData('data/agente.json');
+    const s = AGENTE.stats;
+    document.getElementById('ags1').textContent = s.ebay_total.toLocaleString();
+    document.getElementById('ags2').textContent = s.ebay_sem_estoque.toLocaleString();
+    document.getElementById('ags3').textContent = s.amazon_ativos.toLocaleString();
+    document.getElementById('ags4').textContent = s.walmart_problema.toLocaleString();
+    document.getElementById('agic1').textContent = s.ebay_sem_estoque.toLocaleString();
+    document.getElementById('agic2').textContent = s.walmart_problema.toLocaleString();
+    document.getElementById('agic3').textContent = s.amazon_inativos.toLocaleString();
+    document.getElementById('agic4').textContent = (AGENTE.prec_alterados||[]).length;
+    renderAgenteInsights();
+  } catch(e) {
+    document.getElementById('agente-answer').innerHTML = '<div style="padding:2rem;color:#a8a29e;font-size:14px;">⚠️ agente.json não encontrado. Rode o gerar_json.py primeiro.</div>';
+  }
+}
+
+function renderAgenteInsights() {
+  document.getElementById('agente-insights').style.display = '';
+  document.getElementById('agente-answer').innerHTML = '';
+  document.querySelectorAll('.ag-chip').forEach(c => c.classList.remove('ag-active'));
+}
+
+function agenteChip(el, mode) {
+  document.querySelectorAll('.ag-chip').forEach(c => c.classList.remove('ag-active'));
+  if (el) el.classList.add('ag-active');
+  document.getElementById('agente-insights').style.display = 'none';
+  document.getElementById('agente-answer').innerHTML = agenteRender(mode);
+}
+
+function agenteQuery() {
+  const q = (document.getElementById('agente-input').value || '').toLowerCase().trim();
+  if (!q) return;
+  if (q.includes('vend') || q.includes('top') || q.includes('mais')) { agenteChip(null,'top_vendas'); return; }
+  if (q.includes('estoque') || q.includes('zero') || q.includes('sem '))  { agenteChip(null,'sem_estoque'); return; }
+  if (q.includes('walmart') || q.includes('problem'))                      { agenteChip(null,'walmart_prob'); return; }
+  if (q.includes('amazon') || q.includes('inat'))                          { agenteChip(null,'amazon_inat'); return; }
+  if (q.includes('prec') || q.includes('alter') || q.includes('custo'))   { agenteChip(null,'prec_alt'); return; }
+  if (q.includes('geral') || q.includes('resumo') || q.includes('overview')){ agenteChip(null,'overview'); return; }
+  document.getElementById('agente-insights').style.display = 'none';
+  document.getElementById('agente-answer').innerHTML = `<div class="ag-block"><div class="ag-block-body"><p class="ag-intro" style="color:#a8a29e;">Nenhum resultado para "<strong style="color:#1c1917;">${q}</strong>". Tente: <em>top vendas, sem estoque, walmart, amazon, preços, visão geral.</em></p></div></div>`;
+}
+
+function agenteRender(mode) {
+  if (!AGENTE) return '<div style="padding:1rem;color:#a8a29e;">Carregando…</div>';
+  const s = AGENTE.stats;
+  if (mode === 'top_vendas') {
+    const rows = (AGENTE.top_vendas_ebay||[]).map((r,i) => `<tr>
+      <td class="ag-num" style="color:#a8a29e;width:28px;">${i+1}</td>
+      <td class="ag-sku">${r.sku}</td>
+      <td class="ag-title">${r.title}</td>
+      <td class="ag-num sold">${(r.sold||0).toLocaleString()}</td>
+      <td class="ag-num price">$${(r.price||0).toFixed(2)}</td>
+      <td class="ag-num ${r.qty > 0 ? 'qok' : 'qzero'}">${r.qty}</td>
+    </tr>`).join('');
+    return `<div class="ag-block">
+      <div class="ag-block-head"><span class="ag-badge info">eBay</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Top 10 produtos mais vendidos</span></div>
+      <div class="ag-block-body">
+        <p class="ag-intro">Ranking por <strong>quantidade vendida</strong> acumulada. Verifique o estoque dos líderes.</p>
+        <div class="ag-twrap"><table class="ag-tbl"><thead><tr><th>#</th><th>SKU</th><th>Produto</th><th style="text-align:right">Vendidos</th><th style="text-align:right">Preço</th><th style="text-align:right">Estoque</th></tr></thead><tbody>${rows}</tbody></table></div>
+      </div></div>`;
+  }
+  if (mode === 'sem_estoque') {
+    const d = AGENTE.sem_estoque_ebay||[];
+    const rows = d.map(r => `<tr><td class="ag-sku">${r.sku}</td><td class="ag-title">${r.title}</td><td class="ag-num price">$${(r.price||0).toFixed(2)}</td><td><span class="ag-badge danger">qty: 0</span></td></tr>`).join('');
+    return `<div class="ag-block">
+      <div class="ag-block-head"><span class="ag-badge danger">Alerta</span><span style="font-size:13px;color:#78716c;font-family:monospace;">SKUs sem estoque ativos no eBay</span></div>
+      <div class="ag-block-body">
+        <div class="ag-alert danger">⚠️ <strong>${(s.ebay_sem_estoque||0).toLocaleString()} SKUs</strong> listados com estoque zerado. Mostrando ${d.length}. Risco de venda sem fulfillment.</div>
+        <div class="ag-twrap"><table class="ag-tbl"><thead><tr><th>SKU</th><th>Produto</th><th style="text-align:right">Preço</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
+      </div></div>`;
+  }
+  if (mode === 'walmart_prob') {
+    const d = AGENTE.walmart_problema||[];
+    const rows = d.map(r => `<tr><td class="ag-sku">${r.sku}</td><td class="ag-title">${r.name}</td><td class="ag-num price">$${(r.price||0).toFixed(2)}</td><td><div class="ag-reason">${r.reason}</div></td></tr>`).join('');
+    return `<div class="ag-block">
+      <div class="ag-block-head"><span class="ag-badge warn">Walmart</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Listagens com SYSTEM_PROBLEM</span></div>
+      <div class="ag-block-body">
+        <div class="ag-alert warn">🛒 <strong>${s.walmart_problema}</strong> listagens com problema. Mostrando ${d.length} exemplos.</div>
+        <div class="ag-twrap"><table class="ag-tbl"><thead><tr><th>SKU</th><th>Produto</th><th style="text-align:right">Preço</th><th>Motivo</th></tr></thead><tbody>${rows}</tbody></table></div>
+      </div></div>`;
+  }
+  if (mode === 'amazon_inat') {
+    const d = AGENTE.amazon_inativos||[];
+    const rows = d.map(r => `<tr><td class="ag-sku">${r.sku}</td><td class="ag-title">${r.name}</td><td class="ag-num price">$${(r.price||0).toFixed(2)}</td><td><span class="ag-badge danger">Inativo</span></td></tr>`).join('');
+    return `<div class="ag-block">
+      <div class="ag-block-head"><span class="ag-badge danger">Amazon</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Listagens inativas no Amazon</span></div>
+      <div class="ag-block-body">
+        <div class="ag-alert warn">📦 <strong>${(s.amazon_inativos||0).toLocaleString()}</strong> SKUs inativos (de ${(s.amazon_ativos||0).toLocaleString()} ativos). Mostrando ${d.length}.</div>
+        <div class="ag-twrap"><table class="ag-tbl"><thead><tr><th>SKU</th><th>Produto</th><th style="text-align:right">Preço</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
+      </div></div>`;
+  }
+  if (mode === 'prec_alt') {
+    const d = AGENTE.prec_alterados||[];
+    const rows = d.map(r => {
+      const cls = r.delta < 0 ? 'danger' : r.delta > 0 ? 'ok' : 'info';
+      const sign = r.delta > 0 ? '+' : '';
+      return `<tr><td class="ag-sku">${r.sku}</td><td class="ag-title">${r.desc}</td><td class="ag-num price">$${(r.preco||0).toFixed(2)}</td><td class="ag-num" style="color:#a8a29e;">$${(r.anterior||0).toFixed(2)}</td><td><span class="ag-badge ${cls}">${sign}$${(r.delta||0).toFixed(2)}</span></td><td style="font-size:11px;color:#a8a29e;font-family:monospace;">${r.data||''}</td></tr>`;
+    }).join('');
+    return `<div class="ag-block">
+      <div class="ag-block-head"><span class="ag-badge info">Precificação</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Preços alterados recentemente</span></div>
+      <div class="ag-block-body">
+        <p class="ag-intro">Últimas <strong>${d.length} alterações</strong>. Verifique se os marketplaces foram atualizados.</p>
+        <div class="ag-twrap"><table class="ag-tbl"><thead><tr><th>SKU</th><th>Produto</th><th style="text-align:right">Novo</th><th style="text-align:right">Anterior</th><th>Variação</th><th>Data</th></tr></thead><tbody>${rows}</tbody></table></div>
+      </div></div>`;
+  }
+  if (mode === 'overview') {
+    return `<div class="ag-block">
+      <div class="ag-block-head"><span class="ag-badge info">Overview</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Visão geral da operação</span></div>
+      <div class="ag-block-body">
+        <div class="ag-alert ok">✅ Base com <strong>${(s.produtos_base||0).toLocaleString()}</strong> produtos cadastrados.</div>
+        <div class="ag-alert danger" style="margin-top:8px;">🔴 <strong>${(s.ebay_sem_estoque||0).toLocaleString()}</strong> SKUs sem estoque ainda ativos no eBay (de ${(s.ebay_total||0).toLocaleString()} total).</div>
+        <div class="ag-alert warn" style="margin-top:8px;">🟡 <strong>${s.walmart_problema}</strong> listagens com problema no Walmart precisam de ação.</div>
+        <div class="ag-alert warn" style="margin-top:8px;">🟡 <strong>${(s.amazon_inativos||0).toLocaleString()}</strong> SKUs inativos no Amazon (${(s.amazon_ativos||0).toLocaleString()} ativos).</div>
+        <div style="margin-top:16px;"><table class="ag-tbl">
+          <thead><tr><th>Plataforma</th><th>Total SKUs</th><th>Situação</th></tr></thead>
+          <tbody>
+            <tr><td class="ag-sku">eBay</td><td class="ag-num">${(s.ebay_total||0).toLocaleString()}</td><td><span class="ag-badge danger">${(s.ebay_sem_estoque||0).toLocaleString()} sem estoque</span></td></tr>
+            <tr><td class="ag-sku">Amazon</td><td class="ag-num">${((s.amazon_ativos||0)+(s.amazon_inativos||0)).toLocaleString()}</td><td><span class="ag-badge danger">${(s.amazon_inativos||0).toLocaleString()} inativos</span></td></tr>
+            <tr><td class="ag-sku">Walmart</td><td class="ag-num">${(s.walmart_total||0).toLocaleString()}</td><td><span class="ag-badge warn">${s.walmart_problema} com problema</span></td></tr>
+            <tr><td class="ag-sku">Shopify</td><td class="ag-num">${(s.shopify_total||0).toLocaleString()}</td><td><span class="ag-badge ok">OK</span></td></tr>
+          </tbody>
+        </table></div>
+      </div></div>`;
+  }
+  return '';
+}
+
+
 // ── NAVIGATION ──
 let produtosLoaded = false;
 let S2C=null,PI=null,MP=null,SUP=null,PX=null,PAUSED=null,TAXA=null,SALES=null,VEL=null,GEO=null;
@@ -1616,6 +1868,8 @@ function switchModule(name) {
   } else if (name === 'vendas') {
     if(SALES) { populateVendasFilters(); setTimeout(buildVendas,50); }
     if(GEO) setTimeout(()=>renderGeo('countries'),200);
+  } else if (name === 'agente') {
+    initAgente();
   } else if (name === 'dashboard') {
     if(produtosLoaded) setTimeout(buildDashboard,50);
     else initProdutos();
