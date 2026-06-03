@@ -1660,6 +1660,8 @@ tr:hover td{background:#fafaf9;}
         <button class="ag-chip" onclick="agenteChip(this,'walmart_prob')">🛒 Problemas Walmart</button>
         <button class="ag-chip" onclick="agenteChip(this,'amazon_inat')">📦 Inativos Amazon</button>
         <button class="ag-chip" onclick="agenteChip(this,'prec_alt')">💰 Preços alterados</button>
+        <button class="ag-chip" onclick="agenteChip(this,'fornecedores')">🏭 Fornecedores</button>
+        <button class="ag-chip" onclick="agenteChip(this,'catalogo')">🗂️ Catálogo CM</button>
         <button class="ag-chip" onclick="agenteChip(this,'overview')">📊 Visão geral</button>
       </div>
 
@@ -1674,7 +1676,7 @@ tr:hover td{background:#fafaf9;}
       <!-- Insights cards (default view) -->
       <div id="agente-insights">
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#a8a29e;font-family:monospace;margin-bottom:10px;">alertas e insights</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
           <div class="ag-ic" onclick="agenteChip(null,'sem_estoque')">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;"><div style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0;"></div><div style="font-size:12px;color:#78716c;font-family:monospace;">eBay · sem estoque</div></div>
             <div style="font-size:26px;font-weight:700;font-family:monospace;color:#ef4444;line-height:1;margin-bottom:4px;" id="agic1">—</div>
@@ -1693,7 +1695,17 @@ tr:hover td{background:#fafaf9;}
           <div class="ag-ic" onclick="agenteChip(null,'prec_alt')">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;"><div style="width:8px;height:8px;border-radius:50%;background:#7c3aed;flex-shrink:0;"></div><div style="font-size:12px;color:#78716c;font-family:monospace;">Preços · atualizados</div></div>
             <div style="font-size:26px;font-weight:700;font-family:monospace;color:#7c3aed;line-height:1;margin-bottom:4px;" id="agic4">—</div>
-            <div style="font-size:12px;color:#a8a29e;line-height:1.5;">Preços alterados recentemente na planilha de precificação.</div>
+            <div style="font-size:12px;color:#a8a29e;line-height:1.5;">Preços alterados recentemente nos warehouses Qualy Air.</div>
+          </div>
+          <div class="ag-ic" onclick="agenteChip(null,'catalogo')">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;"><div style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0;"></div><div style="font-size:12px;color:#78716c;font-family:monospace;">Catálogo · pausados</div></div>
+            <div style="font-size:26px;font-weight:700;font-family:monospace;color:#ef4444;line-height:1;margin-bottom:4px;" id="agic5">—</div>
+            <div style="font-size:12px;color:#a8a29e;line-height:1.5;">Produtos pausados no catálogo mestre (CM).</div>
+          </div>
+          <div class="ag-ic" onclick="agenteChip(null,'fornecedores')">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;"><div style="width:8px;height:8px;border-radius:50%;background:#16a34a;flex-shrink:0;"></div><div style="font-size:12px;color:#78716c;font-family:monospace;">Fornecedores · ativos</div></div>
+            <div style="font-size:26px;font-weight:700;font-family:monospace;color:#16a34a;line-height:1;margin-bottom:4px;" id="agic6">—</div>
+            <div style="font-size:12px;color:#a8a29e;line-height:1.5;">Fornecedores monitorados com estoque em tempo real.</div>
           </div>
         </div>
       </div>
@@ -1716,14 +1728,16 @@ async function initAgente() {
   try {
     AGENTE = await fetchData('data/agente.json');
     const s = AGENTE.stats;
-    document.getElementById('ags1').textContent = s.ebay_total.toLocaleString();
-    document.getElementById('ags2').textContent = s.ebay_sem_estoque.toLocaleString();
-    document.getElementById('ags3').textContent = s.amazon_ativos.toLocaleString();
-    document.getElementById('ags4').textContent = s.walmart_problema.toLocaleString();
-    document.getElementById('agic1').textContent = s.ebay_sem_estoque.toLocaleString();
-    document.getElementById('agic2').textContent = s.walmart_problema.toLocaleString();
-    document.getElementById('agic3').textContent = s.amazon_inativos.toLocaleString();
+    document.getElementById('ags1').textContent = (s.ebay_total||0).toLocaleString();
+    document.getElementById('ags2').textContent = (s.ebay_sem_estoque||0).toLocaleString();
+    document.getElementById('ags3').textContent = (s.amazon_ativos||0).toLocaleString();
+    document.getElementById('ags4').textContent = (s.walmart_problema||0).toLocaleString();
+    document.getElementById('agic1').textContent = (s.ebay_sem_estoque||0).toLocaleString();
+    document.getElementById('agic2').textContent = (s.walmart_problema||0).toLocaleString();
+    document.getElementById('agic3').textContent = (s.amazon_inativos||0).toLocaleString();
     document.getElementById('agic4').textContent = (AGENTE.prec_alterados||[]).length;
+    document.getElementById('agic5').textContent = (s.catalogo_pausados||0).toLocaleString();
+    document.getElementById('agic6').textContent = Object.keys(AGENTE.suppliers||{}).length;
     renderAgenteInsights();
   } catch(e) {
     document.getElementById('agente-answer').innerHTML = '<div style="padding:2rem;color:#a8a29e;font-size:14px;">⚠️ agente.json não encontrado. Rode o gerar_json.py primeiro.</div>';
@@ -1746,96 +1760,198 @@ function agenteChip(el, mode) {
 function agenteQuery() {
   const q = (document.getElementById('agente-input').value || '').toLowerCase().trim();
   if (!q) return;
-  if (q.includes('vend') || q.includes('top') || q.includes('mais')) { agenteChip(null,'top_vendas'); return; }
-  if (q.includes('estoque') || q.includes('zero') || q.includes('sem '))  { agenteChip(null,'sem_estoque'); return; }
-  if (q.includes('walmart') || q.includes('problem'))                      { agenteChip(null,'walmart_prob'); return; }
-  if (q.includes('amazon') || q.includes('inat'))                          { agenteChip(null,'amazon_inat'); return; }
-  if (q.includes('prec') || q.includes('alter') || q.includes('custo'))   { agenteChip(null,'prec_alt'); return; }
-  if (q.includes('geral') || q.includes('resumo') || q.includes('overview')){ agenteChip(null,'overview'); return; }
+  const map = [
+    [['top vend','mais vend','mais sold','ranking'],            'top_vendas'],
+    [['estoque zero','sem estoque','qty 0','qty=0','zerado'],   'sem_estoque'],
+    [['walmart','problem','system'],                             'walmart_prob'],
+    [['amazon','inat','inativo'],                               'amazon_inat'],
+    [['prec','alter','custo','preço'],                          'prec_alt'],
+    [['fornecedor','supplier','rn','dna','uac','pbi','gpd'],    'fornecedores'],
+    [['catálogo','catalog','pausado','cm'],                     'catalogo'],
+    [['geral','resumo','overview','tudo'],                      'overview'],
+  ];
+  for (const [keys, mode] of map) {
+    if (keys.some(k => q.includes(k))) { agenteChip(null, mode); return; }
+  }
   document.getElementById('agente-insights').style.display = 'none';
-  document.getElementById('agente-answer').innerHTML = `<div class="ag-block"><div class="ag-block-body"><p class="ag-intro" style="color:#a8a29e;">Nenhum resultado para "<strong style="color:#1c1917;">${q}</strong>". Tente: <em>top vendas, sem estoque, walmart, amazon, preços, visão geral.</em></p></div></div>`;
+  document.getElementById('agente-answer').innerHTML = `<div class="ag-block"><div class="ag-block-body"><p class="ag-intro" style="color:#a8a29e;">Nenhum resultado para "<strong style="color:#1c1917;">${q}</strong>". Tente: <em>top vendas, sem estoque, walmart, amazon, preços, fornecedores, catálogo, visão geral.</em></p></div></div>`;
+}
+
+function agTbl(head, rows) {
+  return `<div class="ag-twrap"><table class="ag-tbl"><thead><tr>${head.map(h=>`<th${h.r?' style="text-align:right"':''} ${h.w?'style="width:'+h.w+'"':''}>${h.l}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function agenteRender(mode) {
   if (!AGENTE) return '<div style="padding:1rem;color:#a8a29e;">Carregando…</div>';
   const s = AGENTE.stats;
+  const n = v => (v||0).toLocaleString();
+  const $ = v => '$'+(v||0).toFixed(2);
+
   if (mode === 'top_vendas') {
-    const rows = (AGENTE.top_vendas_ebay||[]).map((r,i) => `<tr>
+    const all = (AGENTE.top_vendas_ebay||[]).sort((a,b)=>b.sold-a.sold).slice(0,20);
+    const contaColors = {'Stock AC':'#7c3aed','Qualy Air':'#0369a1','Am. Force':'#b45309'};
+    const rows = all.map((r,i)=>`<tr>
       <td class="ag-num" style="color:#a8a29e;width:28px;">${i+1}</td>
+      <td><span style="font-family:monospace;font-size:10px;padding:2px 6px;border-radius:4px;background:#f5f5f4;color:${contaColors[r.conta]||'#57534e'}">${r.conta}</span></td>
       <td class="ag-sku">${r.sku}</td>
       <td class="ag-title">${r.title}</td>
-      <td class="ag-num sold">${(r.sold||0).toLocaleString()}</td>
-      <td class="ag-num price">$${(r.price||0).toFixed(2)}</td>
-      <td class="ag-num ${r.qty > 0 ? 'qok' : 'qzero'}">${r.qty}</td>
+      <td class="ag-num sold">${n(r.sold)}</td>
+      <td class="ag-num price">${$(r.price)}</td>
+      <td class="ag-num ${r.qty>0?'qok':'qzero'}">${r.qty}</td>
     </tr>`).join('');
     return `<div class="ag-block">
-      <div class="ag-block-head"><span class="ag-badge info">eBay</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Top 10 produtos mais vendidos</span></div>
+      <div class="ag-block-head"><span class="ag-badge info">eBay — 3 contas</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Top produtos mais vendidos</span></div>
       <div class="ag-block-body">
-        <p class="ag-intro">Ranking por <strong>quantidade vendida</strong> acumulada. Verifique o estoque dos líderes.</p>
-        <div class="ag-twrap"><table class="ag-tbl"><thead><tr><th>#</th><th>SKU</th><th>Produto</th><th style="text-align:right">Vendidos</th><th style="text-align:right">Preço</th><th style="text-align:right">Estoque</th></tr></thead><tbody>${rows}</tbody></table></div>
+        <p class="ag-intro">Ranking combinado das contas <strong>Stock AC</strong>, <strong>Qualy Air</strong> e <strong>Am. Force</strong>, por quantidade vendida acumulada.</p>
+        ${agTbl([{l:'#'},{l:'Conta'},{l:'SKU'},{l:'Produto'},{l:'Vendidos',r:1},{l:'Preço',r:1},{l:'Estoque',r:1}], rows)}
       </div></div>`;
   }
+
   if (mode === 'sem_estoque') {
     const d = AGENTE.sem_estoque_ebay||[];
-    const rows = d.map(r => `<tr><td class="ag-sku">${r.sku}</td><td class="ag-title">${r.title}</td><td class="ag-num price">$${(r.price||0).toFixed(2)}</td><td><span class="ag-badge danger">qty: 0</span></td></tr>`).join('');
+    const contaColors = {'Stock AC':'#7c3aed','Qualy Air':'#0369a1'};
+    const rows = d.slice(0,50).map(r=>`<tr>
+      <td><span style="font-family:monospace;font-size:10px;padding:2px 6px;border-radius:4px;background:#f5f5f4;color:${contaColors[r.conta]||'#57534e'}">${r.conta}</span></td>
+      <td class="ag-sku">${r.sku}</td><td class="ag-title">${r.title}</td>
+      <td class="ag-num price">${$(r.price)}</td>
+      <td><span class="ag-badge danger">qty: 0</span></td>
+    </tr>`).join('');
     return `<div class="ag-block">
-      <div class="ag-block-head"><span class="ag-badge danger">Alerta</span><span style="font-size:13px;color:#78716c;font-family:monospace;">SKUs sem estoque ativos no eBay</span></div>
+      <div class="ag-block-head"><span class="ag-badge danger">Alerta crítico</span><span style="font-size:13px;color:#78716c;font-family:monospace;">SKUs sem estoque ativos no eBay</span></div>
       <div class="ag-block-body">
-        <div class="ag-alert danger">⚠️ <strong>${(s.ebay_sem_estoque||0).toLocaleString()} SKUs</strong> listados com estoque zerado. Mostrando ${d.length}. Risco de venda sem fulfillment.</div>
-        <div class="ag-twrap"><table class="ag-tbl"><thead><tr><th>SKU</th><th>Produto</th><th style="text-align:right">Preço</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
+        <div class="ag-alert danger">🔴 <strong>${n(s.ebay_sem_estoque)} SKUs</strong> com estoque zerado ainda listados — <strong>${n(s.ebay_stock_sem)}</strong> na conta Stock AC e <strong>${n(s.ebay_qualy_sem)}</strong> na Qualy Air. Risco de venda sem fulfillment.</div>
+        ${agTbl([{l:'Conta'},{l:'SKU'},{l:'Produto'},{l:'Preço',r:1},{l:'Status'}], rows)}
       </div></div>`;
   }
+
   if (mode === 'walmart_prob') {
     const d = AGENTE.walmart_problema||[];
-    const rows = d.map(r => `<tr><td class="ag-sku">${r.sku}</td><td class="ag-title">${r.name}</td><td class="ag-num price">$${(r.price||0).toFixed(2)}</td><td><div class="ag-reason">${r.reason}</div></td></tr>`).join('');
+    const d2 = AGENTE.walmart_despublicados||[];
+    const rows = d.slice(0,30).map(r=>`<tr>
+      <td class="ag-sku">${r.sku}</td><td class="ag-title">${r.name}</td>
+      <td class="ag-num price">${$(r.price)}</td>
+      <td><div class="ag-reason">${r.reason}</div></td>
+    </tr>`).join('');
+    const rows2 = d2.slice(0,15).map(r=>`<tr>
+      <td class="ag-sku">${r.sku}</td><td class="ag-title">${r.name}</td>
+      <td class="ag-num price">${$(r.price)}</td>
+    </tr>`).join('');
     return `<div class="ag-block">
-      <div class="ag-block-head"><span class="ag-badge warn">Walmart</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Listagens com SYSTEM_PROBLEM</span></div>
+      <div class="ag-block-head"><span class="ag-badge warn">Walmart</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Listagens com problema</span></div>
       <div class="ag-block-body">
-        <div class="ag-alert warn">🛒 <strong>${s.walmart_problema}</strong> listagens com problema. Mostrando ${d.length} exemplos.</div>
-        <div class="ag-twrap"><table class="ag-tbl"><thead><tr><th>SKU</th><th>Produto</th><th style="text-align:right">Preço</th><th>Motivo</th></tr></thead><tbody>${rows}</tbody></table></div>
+        <div class="ag-alert warn">🛒 <strong>${n(s.walmart_problema)}</strong> com SYSTEM_PROBLEM + <strong>${n(s.walmart_despublicados)}</strong> despublicados de ${n(s.walmart_total)} total.</div>
+        <p style="font-size:12px;color:#78716c;margin:12px 0 6px;font-family:monospace;text-transform:uppercase;letter-spacing:.05em">System Problem</p>
+        ${agTbl([{l:'SKU'},{l:'Produto'},{l:'Preço',r:1},{l:'Motivo'}], rows)}
+        ${rows2?`<p style="font-size:12px;color:#78716c;margin:16px 0 6px;font-family:monospace;text-transform:uppercase;letter-spacing:.05em">Despublicados</p>${agTbl([{l:'SKU'},{l:'Produto'},{l:'Preço',r:1}], rows2)}`:''}
       </div></div>`;
   }
+
   if (mode === 'amazon_inat') {
     const d = AGENTE.amazon_inativos||[];
-    const rows = d.map(r => `<tr><td class="ag-sku">${r.sku}</td><td class="ag-title">${r.name}</td><td class="ag-num price">$${(r.price||0).toFixed(2)}</td><td><span class="ag-badge danger">Inativo</span></td></tr>`).join('');
+    const rows = d.slice(0,40).map(r=>`<tr>
+      <td class="ag-sku">${r.sku}</td><td class="ag-title">${r.name}</td>
+      <td class="ag-num price">${$(r.price)}</td>
+      <td><span class="ag-badge danger">Inativo</span></td>
+    </tr>`).join('');
     return `<div class="ag-block">
-      <div class="ag-block-head"><span class="ag-badge danger">Amazon</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Listagens inativas no Amazon</span></div>
+      <div class="ag-block-head"><span class="ag-badge danger">Amazon</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Listagens inativas</span></div>
       <div class="ag-block-body">
-        <div class="ag-alert warn">📦 <strong>${(s.amazon_inativos||0).toLocaleString()}</strong> SKUs inativos (de ${(s.amazon_ativos||0).toLocaleString()} ativos). Mostrando ${d.length}.</div>
-        <div class="ag-twrap"><table class="ag-tbl"><thead><tr><th>SKU</th><th>Produto</th><th style="text-align:right">Preço</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
+        <div class="ag-alert warn">📦 <strong>${n(s.amazon_inativos)}</strong> SKUs inativos de <strong>${n(s.amazon_total)}</strong> total (${n(s.amazon_ativos)} ativos = ${Math.round(s.amazon_ativos/s.amazon_total*100)}% ativo).</div>
+        ${agTbl([{l:'SKU'},{l:'Produto'},{l:'Preço',r:1},{l:'Status'}], rows)}
       </div></div>`;
   }
+
   if (mode === 'prec_alt') {
     const d = AGENTE.prec_alterados||[];
-    const rows = d.map(r => {
-      const cls = r.delta < 0 ? 'danger' : r.delta > 0 ? 'ok' : 'info';
-      const sign = r.delta > 0 ? '+' : '';
-      return `<tr><td class="ag-sku">${r.sku}</td><td class="ag-title">${r.desc}</td><td class="ag-num price">$${(r.preco||0).toFixed(2)}</td><td class="ag-num" style="color:#a8a29e;">$${(r.anterior||0).toFixed(2)}</td><td><span class="ag-badge ${cls}">${sign}$${(r.delta||0).toFixed(2)}</span></td><td style="font-size:11px;color:#a8a29e;font-family:monospace;">${r.data||''}</td></tr>`;
+    const rows = d.slice(0,40).map(r=>{
+      const cls = r.delta<0?'danger':r.delta>0?'ok':'info';
+      const sign = r.delta>0?'+':'';
+      return `<tr>
+        <td><span style="font-size:11px;background:#f5f5f4;padding:1px 6px;border-radius:4px;font-family:monospace;color:#57534e">${r.supplier}/${r.warehouse}</span></td>
+        <td class="ag-sku">${r.sku}</td><td class="ag-title">${r.desc}</td>
+        <td class="ag-num price">${$(r.preco)}</td>
+        <td class="ag-num" style="color:#a8a29e">${$(r.anterior)}</td>
+        <td><span class="ag-badge ${cls}">${sign}${$(r.delta)}</span></td>
+        <td style="font-size:11px;color:#a8a29e;font-family:monospace">${(r.data||'').slice(0,16)}</td>
+      </tr>`;
     }).join('');
     return `<div class="ag-block">
-      <div class="ag-block-head"><span class="ag-badge info">Precificação</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Preços alterados recentemente</span></div>
+      <div class="ag-block-head"><span class="ag-badge info">Precificação</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Preços alterados — todos os warehouses</span></div>
       <div class="ag-block-body">
-        <p class="ag-intro">Últimas <strong>${d.length} alterações</strong>. Verifique se os marketplaces foram atualizados.</p>
-        <div class="ag-twrap"><table class="ag-tbl"><thead><tr><th>SKU</th><th>Produto</th><th style="text-align:right">Novo</th><th style="text-align:right">Anterior</th><th>Variação</th><th>Data</th></tr></thead><tbody>${rows}</tbody></table></div>
+        <p class="ag-intro">Alterações recentes detectadas nos arquivos Qualy Air por supplier/warehouse. Total: <strong>${d.length}</strong>.</p>
+        ${agTbl([{l:'Supplier/WH'},{l:'SKU'},{l:'Produto'},{l:'Novo',r:1},{l:'Anterior',r:1},{l:'Variação'},{l:'Data'}], rows)}
       </div></div>`;
   }
-  if (mode === 'overview') {
+
+  if (mode === 'fornecedores') {
+    const sups = AGENTE.suppliers||{};
+    const cards = Object.entries(sups).map(([name, s])=>`
+      <div style="background:#f5f5f4;border-radius:10px;padding:14px 16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-family:monospace;font-weight:700;font-size:15px;color:#1c1917">${name}</span>
+          <span class="ag-badge info">${(s.warehouses||[]).join(' · ')}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px;">
+          <div><div style="color:#a8a29e;font-size:10px;text-transform:uppercase;letter-spacing:.06em">SKUs</div><div style="font-family:monospace;font-weight:700;color:#1c1917">${n(s.skus)}</div></div>
+          <div><div style="color:#a8a29e;font-size:10px;text-transform:uppercase;letter-spacing:.06em">Em estoque</div><div style="font-family:monospace;font-weight:700;color:#16a34a">${n(s.em_estoque)}</div></div>
+          <div><div style="color:#a8a29e;font-size:10px;text-transform:uppercase;letter-spacing:.06em">Sem estoque</div><div style="font-family:monospace;font-weight:700;color:#dc2626">${n(s.sem_estoque)}</div></div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:#78716c">Total unidades: <strong>${n(s.total_unidades)}</strong></div>
+      </div>`).join('');
     return `<div class="ag-block">
-      <div class="ag-block-head"><span class="ag-badge info">Overview</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Visão geral da operação</span></div>
+      <div class="ag-block-head"><span class="ag-badge ok">Fornecedores</span><span style="font-size:13px;color:#78716c;font-family:monospace;">${Object.keys(sups).length} fornecedores · ${n(s.total_supplier_skus)} SKUs totais</span></div>
       <div class="ag-block-body">
-        <div class="ag-alert ok">✅ Base com <strong>${(s.produtos_base||0).toLocaleString()}</strong> produtos cadastrados.</div>
-        <div class="ag-alert danger" style="margin-top:8px;">🔴 <strong>${(s.ebay_sem_estoque||0).toLocaleString()}</strong> SKUs sem estoque ainda ativos no eBay (de ${(s.ebay_total||0).toLocaleString()} total).</div>
-        <div class="ag-alert warn" style="margin-top:8px;">🟡 <strong>${s.walmart_problema}</strong> listagens com problema no Walmart precisam de ação.</div>
-        <div class="ag-alert warn" style="margin-top:8px;">🟡 <strong>${(s.amazon_inativos||0).toLocaleString()}</strong> SKUs inativos no Amazon (${(s.amazon_ativos||0).toLocaleString()} ativos).</div>
-        <div style="margin-top:16px;"><table class="ag-tbl">
-          <thead><tr><th>Plataforma</th><th>Total SKUs</th><th>Situação</th></tr></thead>
-          <tbody>
-            <tr><td class="ag-sku">eBay</td><td class="ag-num">${(s.ebay_total||0).toLocaleString()}</td><td><span class="ag-badge danger">${(s.ebay_sem_estoque||0).toLocaleString()} sem estoque</span></td></tr>
-            <tr><td class="ag-sku">Amazon</td><td class="ag-num">${((s.amazon_ativos||0)+(s.amazon_inativos||0)).toLocaleString()}</td><td><span class="ag-badge danger">${(s.amazon_inativos||0).toLocaleString()} inativos</span></td></tr>
-            <tr><td class="ag-sku">Walmart</td><td class="ag-num">${(s.walmart_total||0).toLocaleString()}</td><td><span class="ag-badge warn">${s.walmart_problema} com problema</span></td></tr>
-            <tr><td class="ag-sku">Shopify</td><td class="ag-num">${(s.shopify_total||0).toLocaleString()}</td><td><span class="ag-badge ok">OK</span></td></tr>
-          </tbody>
-        </table></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">${cards}</div>
+      </div></div>`;
+  }
+
+  if (mode === 'catalogo') {
+    const cat = AGENTE.catalogo||{};
+    const rows = (cat.top_categorias||[]).map(c=>`<tr>
+      <td class="ag-title">${c.cat}</td>
+      <td class="ag-num">${n(c.count)}</td>
+      <td><div style="height:8px;border-radius:4px;background:#e7e5e4;overflow:hidden"><div style="height:100%;border-radius:4px;background:#7c3aed;width:${Math.round(c.count/(cat.top_categorias[0]?.count||1)*100)}%"></div></div></td>
+    </tr>`).join('');
+    return `<div class="ag-block">
+      <div class="ag-block-head"><span class="ag-badge info">Catálogo CM</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Catálogo mestre de produtos</span></div>
+      <div class="ag-block-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+          <div class="ag-stat"><div class="ag-lbl">Total</div><div class="ag-val">${n(cat.total)}</div></div>
+          <div class="ag-stat"><div class="ag-lbl">Ativos</div><div class="ag-val" style="color:#16a34a">${n(cat.ativos)}</div></div>
+          <div class="ag-stat"><div class="ag-lbl">Pausados</div><div class="ag-val" style="color:#dc2626">${n(cat.pausados)}</div></div>
+        </div>
+        <p style="font-size:11px;color:#a8a29e;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;font-family:monospace">Top categorias</p>
+        ${agTbl([{l:'Categoria'},{l:'SKUs',r:1},{l:'Proporção',w:'140px'}], rows)}
+      </div></div>`;
+  }
+
+  if (mode === 'overview') {
+    const sups = AGENTE.suppliers||{};
+    const supRows = Object.entries(sups).map(([name,sp])=>`<tr>
+      <td class="ag-sku">${name}</td>
+      <td class="ag-num">${n(sp.skus)}</td>
+      <td class="ag-num" style="color:#16a34a">${n(sp.em_estoque)}</td>
+      <td class="ag-num" style="color:#dc2626">${n(sp.sem_estoque)}</td>
+      <td style="font-size:11px;color:#78716c">${(sp.warehouses||[]).join(', ')}</td>
+    </tr>`).join('');
+    return `<div class="ag-block">
+      <div class="ag-block-head"><span class="ag-badge info">Visão geral</span><span style="font-size:13px;color:#78716c;font-family:monospace;">Resumo de todas as plataformas e fontes</span></div>
+      <div class="ag-block-body">
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:#a8a29e;font-family:monospace;margin-bottom:10px">Marketplaces</p>
+        ${agTbl([{l:'Plataforma'},{l:'Total',r:1},{l:'Situação'}],[
+          `<tr><td class="ag-sku">eBay (Stock AC)</td><td class="ag-num">${n(s.ebay_stock_total)}</td><td><span class="ag-badge danger">${n(s.ebay_stock_sem)} sem estoque</span></td></tr>`,
+          `<tr><td class="ag-sku">eBay (Qualy Air)</td><td class="ag-num">${n(s.ebay_qualy_total)}</td><td><span class="ag-badge danger">${n(s.ebay_qualy_sem)} sem estoque</span></td></tr>`,
+          `<tr><td class="ag-sku">eBay (Am. Force)</td><td class="ag-num">${n(s.ebay_force_total)}</td><td><span class="ag-badge ok">—</span></td></tr>`,
+          `<tr><td class="ag-sku">Amazon</td><td class="ag-num">${n(s.amazon_total)}</td><td><span class="ag-badge danger">${n(s.amazon_inativos)} inativos</span></td></tr>`,
+          `<tr><td class="ag-sku">Walmart</td><td class="ag-num">${n(s.walmart_total)}</td><td><span class="ag-badge warn">${n(s.walmart_problema)} problem · ${n(s.walmart_despublicados)} unpub</span></td></tr>`,
+          `<tr><td class="ag-sku">Shopify</td><td class="ag-num">${n(s.shopify_total)}</td><td><span class="ag-badge ok">OK</span></td></tr>`,
+        ].join(''))}
+        <div class="ag-alert danger" style="margin-top:14px">🔴 <strong>${n(s.ebay_sem_estoque)}</strong> SKUs no eBay com qty=0 ainda ativos.</div>
+        <div class="ag-alert warn" style="margin-top:8px">🟡 <strong>${n(s.walmart_problema)}</strong> listagens com SYSTEM_PROBLEM no Walmart.</div>
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:#a8a29e;font-family:monospace;margin:16px 0 10px">Fornecedores</p>
+        ${agTbl([{l:'Supplier'},{l:'SKUs',r:1},{l:'Em estoque',r:1},{l:'Sem estoque',r:1},{l:'Warehouses'}], supRows)}
+        <div class="ag-alert ok" style="margin-top:14px">📦 <strong>${n(s.total_supplier_skus)}</strong> SKUs totais disponíveis entre todos os fornecedores.</div>
+        <div class="ag-alert ok" style="margin-top:8px">🗂️ Catálogo mestre: <strong>${n(s.catalogo_total)}</strong> produtos — <strong>${n(s.catalogo_ativos)}</strong> ativos, <strong>${n(s.catalogo_pausados)}</strong> pausados.</div>
       </div></div>`;
   }
   return '';
